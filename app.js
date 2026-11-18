@@ -346,6 +346,54 @@ $("#themeBtn").addEventListener("click", () => {
 });
 
 applyTheme();
+$("#fpsTips").textContent = fpsGuides[$("#fpsProfile").value];
+
+const fpsGuides = {
+  low: "Low-end: set Roblox Graphics Mode to Manual and lower the in-game graphics quality; close unused apps, keep some free storage, and avoid playing while the phone is hot.",
+  balanced: "Balanced: start with medium in-game graphics, close heavy background apps, use a stable connection, and lower graphics if frame pacing becomes uneven.",
+  performance: "Performance priority: use the lowest graphics level that still looks clear, close background downloads, keep the phone ventilated, and avoid battery-saving modes that throttle performance."
+};
+$("#fpsProfile").addEventListener("change", () => {
+  $("#fpsTips").textContent = fpsGuides[$("#fpsProfile").value] || fpsGuides.balanced;
+});
+let fpsTestRunning = false;
+$("#fpsTestBtn").addEventListener("click", () => {
+  if (fpsTestRunning) return;
+  fpsTestRunning = true;
+  const button = $("#fpsTestBtn");
+  const result = $("#fpsResult");
+  const label = $("#fpsResultLabel");
+  button.disabled = true;
+  button.textContent = "Testing…";
+  result.textContent = "…";
+  label.textContent = "Measuring this page";
+  const started = performance.now();
+  let frames = 0;
+  function sample(now) {
+    if (document.visibilityState === "hidden") {
+      fpsTestRunning = false;
+      button.disabled = false;
+      button.textContent = "Run 5-second test";
+      result.textContent = "—";
+      label.textContent = "Test paused because the app was hidden";
+      return;
+    }
+    frames += 1;
+    const elapsed = now - started;
+    if (elapsed >= 5000) {
+      const measured = Math.round(frames * 1000 / elapsed);
+      result.textContent = measured + " FPS";
+      label.textContent = "Browser animation estimate · not Roblox FPS";
+      button.disabled = false;
+      button.textContent = "Run again";
+      fpsTestRunning = false;
+      return;
+    }
+    requestAnimationFrame(sample);
+  }
+  requestAnimationFrame(sample);
+});
+
 render();
 if (startupWarning) toast(startupWarning);
 if ("serviceWorker" in navigator) {
