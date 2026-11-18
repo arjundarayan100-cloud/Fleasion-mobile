@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#10131d"><meta name="description" content="Fleasion Mobile companion for managing Roblox asset replacement profiles.">
+<link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="style.css">
+<title>Fleasion Mobile</title>
+</head>
+<body>
+<header><div class="brand"><span class="logo">F</span><div><b>FLEASION</b><small>MOBILE COMPANION · 0.1.0</small></div></div><button id="themeBtn" class="iconbtn" aria-label="Toggle theme">☼</button></header>
+<main>
+<section class="hero"><p class="eyebrow">ROBLOX ASSET WORKSPACE</p><h1>Your assets.<br><span>Your profiles.</span></h1><p class="muted">Create and manage replacement profiles on Android. Changes are saved on this device.</p></section>
+<nav class="tabs"><button class="tab active" data-tab="profiles">Profiles</button><button class="tab" data-tab="rules">Replacement rules</button><button class="tab" data-tab="tools">Tools</button></nav>
+<section id="profiles" class="panel active">
+<div class="sectionhead"><div><h2>Profiles</h2><p class="muted">Keep different setups organized.</p></div><button id="newProfile" class="primary">＋ New</button></div>
+<div id="profileList" class="stack"></div>
+<div class="actions"><button id="importConfig" class="secondary">Import JSON</button><button id="exportConfig" class="secondary">Export current</button><input id="fileInput" type="file" accept=".json,application/json" hidden></div>
+</section>
+<section id="rules" class="panel">
+<div class="sectionhead"><div><h2>Replacement rules</h2><p class="muted">Rules are stored in your selected profile.</p></div><button id="newRule" class="primary">＋ Add rule</button></div>
+<div id="ruleList" class="stack"></div>
+<div class="notice"><b>Mobile compatibility note</b><p>This companion can edit and export Fleasion-style configuration data. It does not intercept Roblox Android traffic or apply replacements inside Rivals by itself.</p></div>
+</section>
+<section id="tools" class="panel">
+<h2>Local tools</h2><p class="muted">Utilities that work directly in your browser.</p>
+<div class="toolcard"><div><b>JSON validator</b><p class="muted">Check a config file before importing.</p></div><button id="validateBtn" class="secondary">Choose file</button><input id="validateInput" type="file" accept=".json,application/json" hidden></div>
+<div class="toolcard"><div><b>Storage</b><p class="muted" id="storageInfo">Your profiles are stored locally.</p></div><button id="resetBtn" class="danger">Reset app</button></div>
+<div class="notice"><b>Feature roadmap</b><p>Next: inspect the original Fleasion modules and port safe, Android-compatible config, cache browsing, previews and conversion tools. Desktop-only proxy, certificate and Roblox launch integration cannot be assumed to work on Android.</p></div>
+</section>
+<footer>Fleasion Mobile is an independent Android companion prototype. Not affiliated with Roblox.</footer>
+</main>
+<dialog id="profileDialog"><form method="dialog" id="profileForm"><div class="modalhead"><h2 id="profileDialogTitle">New profile</h2><button class="iconbtn" value="cancel">✕</button></div><label>Profile name<input id="profileName" maxlength="60" required placeholder="e.g. Rivals loadout"></label><div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveProfile" value="default">Save</button></div></form></dialog>
+<dialog id="ruleDialog"><form method="dialog" id="ruleForm"><div class="modalhead"><h2 id="ruleDialogTitle">Add replacement</h2><button class="iconbtn" value="cancel">✕</button></div>
+<label>Original asset ID<input id="originalId" inputmode="numeric" placeholder="123456789" required></label>
+<label>Replacement target<input id="replacement" placeholder="Asset ID, https:// URL, or local path" required></label>
+<label>Notes (optional)<input id="ruleNotes" maxlength="120" placeholder="Weapon texture"></label>
+<div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveRule" value="default">Save rule</button></div></form></dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="app.js"></script>
+</body></html>
