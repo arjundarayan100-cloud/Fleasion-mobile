@@ -1,41 +1,59 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111525"><meta name="description" content="Fleasion Mobile companion for organizing local profiles and JSON backups.">
-<link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="style.css?v=040">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080d16">
+<meta name="description" content="Fleasion Mobile — organize profiles and configuration backups.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="style.css?v=100">
 <title>Fleasion Mobile</title>
 </head>
 <body>
-<header><div class="brand"><span class="logo">F</span><div><b>FLEASION</b><small>MOBILE COMPANION · 0.4.0</small></div></div><button type="button" id="themeBtn" class="iconbtn" aria-label="Switch theme" aria-pressed="false">☼</button></header>
+<header class="topbar">
+  <a class="brand" href="#" aria-label="Fleasion home"><span class="brand-mark">F<span>.</span></span><span class="brand-copy"><b>FLEASION</b><small>MOBILE WORKSPACE</small></span></a>
+  <div class="top-actions"><span class="version-pill">V1.0</span><button type="button" id="themeBtn" class="iconbtn" aria-label="Switch theme" aria-pressed="false">☼</button></div>
+</header>
 <main>
-<section class="hero"><div class="welcome-label"><span class="spark">✦</span> YOUR WORKSPACE</div><h1>Welcome to <span>Fleasion.</span></h1><p class="muted">A simple place to organize your profiles and keep your configuration files tidy.</p><div class="stats"><div class="stat-card"><span class="stat-icon">▣</span><div><b id="profileStat">—</b><small>YOUR PROFILES</small></div></div><div class="stat-card"><span class="stat-icon">↗</span><div><b id="ruleStat">—</b><small>ENABLED RULES</small></div></div></div></section><section class="getting-started" aria-labelledby="startTitle"><div class="guide-heading"><div><span class="eyebrow">NEW HERE?</span><h2 id="startTitle">Get started in 3 steps</h2></div><span class="guide-mark">✦</span></div><div class="guide-steps"><div class="guide-step"><span>1</span><div><b>Create a profile</b><small>Give your setup a name.</small></div></div><div class="guide-step"><span>2</span><div><b>Add your rules</b><small>Keep each rule in one place.</small></div></div><div class="guide-step"><span>3</span><div><b>Save a backup</b><small>Export your profile as JSON.</small></div></div></div></section>
-<nav class="tabs" aria-label="App sections" role="tablist"><button type="button" class="tab active" role="tab" aria-selected="true" data-tab="profiles">▦ &nbsp;Profiles</button><button type="button" class="tab" role="tab" aria-selected="false" data-tab="rules">⇄ &nbsp;Rules</button><button type="button" class="tab" role="tab" aria-selected="false" data-tab="tools">⚙ &nbsp;Tools</button></nav>
-<section id="profiles" class="panel active">
-<div class="sectionhead"><div><span class="eyebrow">YOUR SETUPS</span><h2>Your profiles</h2><p class="muted">Each profile keeps its own rules.</p></div><button id="newProfile" class="primary">＋ Create</button></div>
-<div id="profileList" class="stack"></div>
-<div class="backup-heading"><b>Move or back up a profile</b><span>Import a saved file or export your current one.</span></div><div class="actions"><button id="importConfig" class="secondary">↧ Import file</button><button id="exportConfig" class="secondary">↥ Export backup</button><input id="fileInput" type="file" accept=".json,application/json" hidden></div>
-</section>
-<section id="rules" class="panel">
-<div class="sectionhead"><div><span class="eyebrow">PROFILE SETTINGS</span><h2>Your rules</h2><p class="muted">Rules belong to the profile you selected.</p></div><button id="newRule" class="primary">＋ Add rule</button></div>
-<div class="rule-tools"><input id="ruleSearch" type="search" placeholder="Search ID, target, or notes…" aria-label="Search replacement rules"><span id="ruleCount" class="muted"></span></div>
-<div id="ruleList" class="stack"></div>
-<div class="notice"><b>Good to know</b><p>Fleasion Mobile organizes and exports configuration data. It does not apply changes inside the Roblox Android app.</p></div>
-</section>
-<section id="tools" class="panel">
-<span class="eyebrow">EXTRA UTILITIES</span><h2>Helpful tools</h2><p class="muted">Small helpers for checking files and managing your saved data.</p>
-<div class="toolcard"><div><b>JSON validator</b><p class="muted">Check a config file before importing.</p></div><button id="validateBtn" class="secondary">Choose file</button><input id="validateInput" type="file" accept=".json,application/json" hidden></div>
-<div class="toolcard"><div><b>Storage</b><p class="muted" id="storageInfo">Your profiles are stored locally.</p></div><button id="resetBtn" class="danger">Reset app</button></div>
-<div class="notice"><b>Feature roadmap</b><p>Future work: inspect the original Fleasion modules and port safe, Android-compatible config, cache browsing, previews and conversion tools. Desktop-only proxy, certificate and Roblox launch integration cannot be assumed to work on Android.</p></div>
-</section>
-<footer>Fleasion Mobile is an independent Android companion prototype. Not affiliated with Roblox.</footer>
+  <section class="hero">
+    <div class="hero-copy"><span class="eyebrow"><i></i> PERSONAL ASSET WORKSPACE</span><h1>Make it <span>yours.</span></h1><p>Keep your profiles, rules and backups organised in one clean space.</p></div>
+    <div class="hero-orbit" aria-hidden="true"><div class="orbit-ring"></div><div class="orbit-core">F<span>.</span></div><i class="orbit-dot"></i></div>
+  </section>
+  <section class="overview" aria-label="Workspace overview">
+    <div class="overview-head"><div><span class="eyebrow">OVERVIEW</span><h2>Your workspace</h2></div><span class="live-tag"><i></i> LOCAL</span></div>
+    <div class="stats">
+      <div class="stat-card"><span class="stat-symbol">▤</span><div><b id="profileStat">—</b><small>PROFILES</small></div></div>
+      <div class="stat-card"><span class="stat-symbol">⌁</span><div><b id="ruleStat">—</b><small>ACTIVE RULES</small></div></div>
+    </div>
+  </section>
+  <nav class="tabs" aria-label="App sections" role="tablist">
+    <button type="button" class="tab active" role="tab" aria-selected="true" data-tab="profiles"><span>▦</span>Profiles</button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="rules"><span>⌁</span>Rules</button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="tools"><span>⚙</span>Tools</button>
+  </nav>
+  <section id="profiles" class="panel active">
+    <div class="sectionhead"><div><span class="eyebrow">YOUR COLLECTION</span><h2>Profiles</h2><p class="muted">Separate setups, neatly organised.</p></div><button id="newProfile" class="primary">＋ New</button></div>
+    <div id="profileList" class="stack"></div>
+    <div class="backup-card"><div class="backup-icon">↕</div><div class="backup-copy"><b>Backup & transfer</b><span>Move profiles or keep a safe copy.</span></div><div class="actions"><button id="importConfig" class="secondary">Import</button><button id="exportConfig" class="secondary">Export</button><input id="fileInput" type="file" accept=".json,application/json" hidden></div></div>
+  </section>
+  <section id="rules" class="panel">
+    <div class="sectionhead"><div><span class="eyebrow">CONFIGURATION</span><h2>Replacement rules</h2><p class="muted">Manage the rules saved in your selected profile.</p></div><button id="newRule" class="primary">＋ Add</button></div>
+    <div class="search-wrap"><span>⌕</span><input id="ruleSearch" type="search" placeholder="Search ID, target or notes…" aria-label="Search replacement rules"></div>
+    <div class="rule-summary"><span id="ruleCount" class="muted"></span><span class="summary-dot"></span><span class="muted">Selected profile</span></div>
+    <div id="ruleList" class="stack"></div>
+    <div class="notice"><b>Companion mode</b><p>Fleasion organises and exports configuration data. It does not apply changes inside the Roblox Android app.</p></div>
+  </section>
+  <section id="tools" class="panel">
+    <div class="sectionhead"><div><span class="eyebrow">WORKSPACE UTILITIES</span><h2>Tools</h2><p class="muted">Quick checks and device storage.</p></div></div>
+    <div class="toolcard"><div class="tool-icon">✓</div><div class="tool-copy"><b>JSON validator</b><p>Check a config file before importing.</p></div><button id="validateBtn" class="secondary">Choose file</button><input id="validateInput" type="file" accept=".json,application/json" hidden></div>
+    <div class="toolcard"><div class="tool-icon">▣</div><div class="tool-copy"><b>Local storage</b><p id="storageInfo">Your profiles are stored on this device.</p></div><span class="local-chip">ON DEVICE</span></div>
+    <div class="toolcard danger-card"><div class="tool-icon">↺</div><div class="tool-copy"><b>Reset workspace</b><p>Remove all locally saved profiles.</p></div><button id="resetBtn" class="danger">Reset</button></div>
+    <div class="notice roadmap"><b>Built for mobile</b><p>Fleasion Mobile is an independent companion for organising your own configuration data. Desktop-only integrations are not included in this Android build.</p></div>
+  </section>
+  <footer><span class="footer-mark">F.</span><span>Fleasion Mobile · Independent companion</span></footer>
 </main>
-<dialog id="profileDialog"><form method="dialog" id="profileForm"><div class="modalhead"><h2 id="profileDialogTitle">New profile</h2><button class="iconbtn" value="cancel">✕</button></div><label>Profile name<input id="profileName" maxlength="60" required placeholder="e.g. Rivals loadout"></label><div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveProfile" value="default">Save</button></div></form></dialog>
-<dialog id="ruleDialog"><form method="dialog" id="ruleForm"><div class="modalhead"><h2 id="ruleDialogTitle">Add replacement</h2><button class="iconbtn" value="cancel">✕</button></div>
-<label>Original asset ID<input id="originalId" inputmode="numeric" placeholder="123456789" required></label>
-<label>Replacement target<input id="replacement" placeholder="Asset ID, https:// URL, or local path" required></label>
-<label>Notes (optional)<input id="ruleNotes" maxlength="120" placeholder="Weapon texture"></label>
-<div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveRule" value="default">Save rule</button></div></form></dialog>
+<dialog id="profileDialog"><form method="dialog" id="profileForm"><div class="modalhead"><div><span class="eyebrow">PROFILE SETTINGS</span><h2 id="profileDialogTitle">New profile</h2></div><button class="iconbtn" value="cancel" aria-label="Close">✕</button></div><label>Profile name<input id="profileName" maxlength="60" required placeholder="e.g. My setup"></label><div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveProfile" value="default">Save profile</button></div></form></dialog>
+<dialog id="ruleDialog"><form method="dialog" id="ruleForm"><div class="modalhead"><div><span class="eyebrow">RULE EDITOR</span><h2 id="ruleDialogTitle">Add rule</h2></div><button class="iconbtn" value="cancel" aria-label="Close">✕</button></div><label>Original asset ID<input id="originalId" inputmode="numeric" placeholder="123456789" required></label><label>Replacement target<input id="replacement" placeholder="Asset ID, HTTPS URL, or local path" required></label><label>Notes <span class="optional">(optional)</span><input id="ruleNotes" maxlength="120" placeholder="Add a short note"></label><div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveRule" value="default">Save rule</button></div></form></dialog>
 <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
-<script src="app.js?v=040"></script>
+<script src="app.js?v=100"></script>
 </body></html>
