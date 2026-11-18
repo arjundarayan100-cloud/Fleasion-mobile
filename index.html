@@ -6,13 +6,13 @@
 <meta name="theme-color" content="#080d16">
 <meta name="description" content="Fleasion Mobile — organize profiles and configuration backups.">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="style.css?v=100">
+<link rel="stylesheet" href="style.css?v=101">
 <title>Fleasion Mobile</title>
 </head>
 <body>
 <header class="topbar">
   <a class="brand" href="#" aria-label="Fleasion home"><span class="brand-mark">F<span>.</span></span><span class="brand-copy"><b>FLEASION</b><small>MOBILE WORKSPACE</small></span></a>
-  <div class="top-actions"><span class="version-pill">V1.0</span><button type="button" id="themeBtn" class="iconbtn" aria-label="Switch theme" aria-pressed="false">☼</button></div>
+  <div class="top-actions"><span class="version-pill">V0.5.0</span><button type="button" id="themeBtn" class="iconbtn" aria-label="Switch theme" aria-pressed="false">☼</button></div>
 </header>
 <main>
   <section class="hero">
@@ -46,6 +46,14 @@
   <section id="tools" class="panel">
     <div class="sectionhead"><div><span class="eyebrow">WORKSPACE UTILITIES</span><h2>Tools</h2><p class="muted">Quick checks and device storage.</p></div></div>
     <div class="toolcard"><div class="tool-icon">✓</div><div class="tool-copy"><b>JSON validator</b><p>Check a config file before importing.</p></div><button id="validateBtn" class="secondary">Choose file</button><input id="validateInput" type="file" accept=".json,application/json" hidden></div>
+    <div class="fps-panel">
+      <div class="fps-panel-head"><div><span class="eyebrow">DEVICE CHECK</span><h3>FPS quick check</h3><p>Measures this app's browser animation smoothness, not Roblox's in-game FPS.</p></div><span class="fps-chip">5 SEC</span></div>
+      <div class="fps-result"><b id="fpsResult">—</b><span id="fpsResultLabel">Ready to test</span></div>
+      <button type="button" id="fpsTestBtn" class="primary fps-test">Run 5-second test</button>
+      <div class="fps-profile-row"><label for="fpsProfile">Performance guide</label><select id="fpsProfile"><option value="low">Low-end device</option><option value="balanced" selected>Balanced</option><option value="performance">Performance priority</option></select></div>
+      <p id="fpsTips" class="fps-tips">Use Roblox's in-game graphics controls and keep the phone cool for steadier performance.</p>
+      <p class="fps-disclaimer">This tool does not change Roblox settings, install FFlags, or guarantee 30–50 FPS. Results depend on the phone, game, temperature and network.</p>
+    </div>
     <div class="toolcard"><div class="tool-icon">▣</div><div class="tool-copy"><b>Local storage</b><p id="storageInfo">Your profiles are stored on this device.</p></div><span class="local-chip">ON DEVICE</span></div>
     <div class="toolcard danger-card"><div class="tool-icon">↺</div><div class="tool-copy"><b>Reset workspace</b><p>Remove all locally saved profiles.</p></div><button id="resetBtn" class="danger">Reset</button></div>
     <div class="notice roadmap"><b>Built for mobile</b><p>Fleasion Mobile is an independent companion for organising your own configuration data. Desktop-only integrations are not included in this Android build.</p></div>
@@ -55,5 +63,5 @@
 <dialog id="profileDialog"><form method="dialog" id="profileForm"><div class="modalhead"><div><span class="eyebrow">PROFILE SETTINGS</span><h2 id="profileDialogTitle">New profile</h2></div><button class="iconbtn" value="cancel" aria-label="Close">✕</button></div><label>Profile name<input id="profileName" maxlength="60" required placeholder="e.g. My setup"></label><div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveProfile" value="default">Save profile</button></div></form></dialog>
 <dialog id="ruleDialog"><form method="dialog" id="ruleForm"><div class="modalhead"><div><span class="eyebrow">RULE EDITOR</span><h2 id="ruleDialogTitle">Add rule</h2></div><button class="iconbtn" value="cancel" aria-label="Close">✕</button></div><label>Original asset ID<input id="originalId" inputmode="numeric" placeholder="123456789" required></label><label>Replacement target<input id="replacement" placeholder="Asset ID, HTTPS URL, or local path" required></label><label>Notes <span class="optional">(optional)</span><input id="ruleNotes" maxlength="120" placeholder="Add a short note"></label><div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveRule" value="default">Save rule</button></div></form></dialog>
 <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
-<script src="app.js?v=100"></script>
+<script src="app.js?v=101"></script>
 </body></html>
