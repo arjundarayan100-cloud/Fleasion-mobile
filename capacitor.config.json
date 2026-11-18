@@ -1,0 +1,9 @@
+{
+  "appId": "com.fleasion.mobile",
+  "appName": "Fleasion Mobile",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "android": {
+    "backgroundColor": "#0c1020"
+  }
+}
