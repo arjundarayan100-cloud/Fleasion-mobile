@@ -8,7 +8,7 @@ function createStarter() {
   return { version: 1, profiles: [{ id: makeId(), name: "Default profile", rules: [] }], active: 0 };
 }
 function readLocal(key) {
-  try { return localStorage.getItem(key); } catch { return null; }
+  try { return localStorage.getItem(key); } catch { persistenceAvailable = false; return null; }
 }
 
 let persistenceAvailable = true;
