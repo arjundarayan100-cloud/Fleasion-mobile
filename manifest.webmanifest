@@ -3,7 +3,7 @@
   "short_name": "Fleasion",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0d1018",
-  "theme_color": "#10131d",
-  "description": "A mobile-friendly companion for managing local asset profiles and JSON backups."
+  "background_color": "#0c1020",
+  "theme_color": "#111525",
+  "description": "A simple mobile companion for organizing local profiles and JSON backups."
 }
