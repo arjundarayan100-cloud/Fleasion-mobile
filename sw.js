@@ -1,5 +1,5 @@
 const CACHE = "fleasion-mobile-v3";
-const ASSETS = ["./", "./index.html", "./style.css", "./app.js", "./manifest.webmanifest"];
+const ASSETS = ["./", "./index.html", "./style.css?v=030", "./app.js?v=030", "./manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
