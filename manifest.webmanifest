@@ -5,5 +5,5 @@
   "display": "standalone",
   "background_color": "#0d1018",
   "theme_color": "#10131d",
-  "description": "Manage Roblox asset replacement profiles on Android."
+  "description": "A mobile-friendly companion for managing local asset profiles and JSON backups."
 }
