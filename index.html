@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#10131d"><meta name="description" content="Fleasion Mobile companion for managing asset replacement profiles.">
+<meta name="theme-color" content="#10131d"><meta name="description" content="Fleasion Mobile companion for organizing local profiles and JSON backups.">
 <link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="style.css">
 <title>Fleasion Mobile</title>
 </head>
 <body>
-<header><div class="brand"><span class="logo">F</span><div><b>FLEASION</b><small>MOBILE COMPANION · 0.2.0</small></div></div><button id="themeBtn" class="iconbtn" aria-label="Toggle theme">☼</button></header>
+<header><div class="brand"><span class="logo">F</span><div><b>FLEASION</b><small>MOBILE COMPANION · 0.3.0</small></div></div><button type="button" id="themeBtn" class="iconbtn" aria-label="Switch theme" aria-pressed="false">☼</button></header>
 <main>
 <section class="hero"><p class="eyebrow">ROBLOX ASSET WORKSPACE</p><h1>Your assets.<br><span>Your profiles.</span></h1><p class="muted">Create and manage replacement profiles on Android. Changes are saved on this device.</p><div class="stats"><div><b id="profileStat">—</b><small>PROFILES</small></div><div><b id="ruleStat">—</b><small>ACTIVE RULES</small></div></div></section>
-<nav class="tabs"><button class="tab active" data-tab="profiles">Profiles</button><button class="tab" data-tab="rules">Replacement rules</button><button class="tab" data-tab="tools">Tools</button></nav>
+<nav class="tabs" aria-label="App sections" role="tablist"><button type="button" class="tab active" role="tab" aria-selected="true" data-tab="profiles">Profiles</button><button type="button" class="tab" role="tab" aria-selected="false" data-tab="rules">Replacement rules</button><button type="button" class="tab" role="tab" aria-selected="false" data-tab="tools">Tools</button></nav>
 <section id="profiles" class="panel active">
 <div class="sectionhead"><div><h2>Profiles</h2><p class="muted">Keep different setups organized.</p></div><button id="newProfile" class="primary">＋ New</button></div>
 <div id="profileList" class="stack"></div>
@@ -36,6 +36,6 @@
 <label>Replacement target<input id="replacement" placeholder="Asset ID, https:// URL, or local path" required></label>
 <label>Notes (optional)<input id="ruleNotes" maxlength="120" placeholder="Weapon texture"></label>
 <div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveRule" value="default">Save rule</button></div></form></dialog>
-<div id="toast" role="status" aria-live="polite"></div>
+<div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 <script src="app.js?v=020"></script>
 </body></html>
