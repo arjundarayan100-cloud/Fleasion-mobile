@@ -345,14 +345,13 @@ $("#themeBtn").addEventListener("click", () => {
   toast((isLight ? "Light" : "Dark") + " theme");
 });
 
-applyTheme();
-$("#fpsTips").textContent = fpsGuides[$("#fpsProfile").value];
-
 const fpsGuides = {
   low: "Low-end: set Roblox Graphics Mode to Manual and lower the in-game graphics quality; close unused apps, keep some free storage, and avoid playing while the phone is hot.",
   balanced: "Balanced: start with medium in-game graphics, close heavy background apps, use a stable connection, and lower graphics if frame pacing becomes uneven.",
   performance: "Performance priority: use the lowest graphics level that still looks clear, close background downloads, keep the phone ventilated, and avoid battery-saving modes that throttle performance."
 };
+applyTheme();
+$("#fpsTips").textContent = fpsGuides[$("#fpsProfile").value];
 $("#fpsProfile").addEventListener("change", () => {
   $("#fpsTips").textContent = fpsGuides[$("#fpsProfile").value] || fpsGuides.balanced;
 });
