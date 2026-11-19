@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#080d16">
 <meta name="description" content="Fleasion Mobile — organize profiles and configuration backups.">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="style.css?v=103">
+<link rel="stylesheet" href="style.css?v=104">
 <title>Fleasion Mobile</title>
 </head>
 <body>
@@ -39,20 +39,31 @@
     </div>
   </section>
   <section class="fps-panel fps-command">
-    <div class="fps-panel-head"><div><span class="eyebrow"><i></i> PERFORMANCE CENTER</span><h2>FPS Lab</h2><p>Check device readiness and get a sensible setup for smoother gameplay.</p></div><span class="fps-chip">LAB</span></div>
+    <div class="fps-panel-head"><div><span class="eyebrow"><i></i> PERFORMANCE CENTER · 4 GB READY</span><h2>FPS Lab</h2><p>A practical tune-up and device health check for smoother gameplay.</p></div><span class="fps-chip">BETA</span></div>
+    <div class="optimizer-hero">
+      <div class="optimizer-orbit"><div class="optimizer-core"><span>F</span><small>READY</small></div></div>
+      <div class="optimizer-copy"><b id="optimizerState">Your device is not checked yet</b><p id="optimizerSub">Run a quick readiness scan before opening Roblox.</p><button type="button" id="optimizeBtn" class="primary">Run smart tune-up</button></div>
+    </div>
     <div class="fps-metrics">
-      <div class="fps-metric"><small>BROWSER TEST</small><b id="fpsResult">—</b><span id="fpsResultLabel">Ready when you are</span></div>
-      <div class="fps-metric"><small>OPTIMIZATION MODE</small><b id="fpsModeLabel">Balanced</b><span>Recommendation profile</span></div>
+      <div class="fps-metric"><small>AVAILABLE RAM</small><b id="deviceRam">—</b><span id="deviceRamHint">Native diagnostic</span></div>
+      <div class="fps-metric"><small>THERMAL STATUS</small><b id="deviceThermal">—</b><span id="deviceThermalHint">Protect device cooling</span></div>
+      <div class="fps-metric"><small>DISPLAY RATE</small><b id="deviceRefresh">—</b><span>Current Android display mode</span></div>
     </div>
-    <button type="button" id="fpsTestBtn" class="primary fps-test">Run 5-second smoothness test</button>
-    <div class="fps-profile-row"><label for="fpsProfile">Choose a performance guide</label><select id="fpsProfile"><option value="low">Low-end device</option><option value="balanced" selected>Balanced</option><option value="performance">Performance priority</option></select></div>
+    <div class="fps-profile-row"><label for="fpsProfile">Performance guide</label><select id="fpsProfile"><option value="low">4 GB / Low-end</option><option value="balanced" selected>Balanced</option><option value="performance">Performance priority</option></select></div>
     <div class="fps-guide-grid">
-      <article class="fps-guide-card"><span>01 · GRAPHICS</span><b>In-game quality</b><p>Start with lower Roblox graphics on demanding experiences, then raise it only if frame pacing stays smooth.</p></article>
-      <article class="fps-guide-card"><span>02 · THERMALS</span><b>Keep it cool</b><p>Heat can reduce performance. Take a break if the device becomes unusually hot.</p></article>
-      <article class="fps-guide-card"><span>03 · MEMORY</span><b>Free up headroom</b><p>Close apps you are finished using and keep some internal storage available.</p></article>
+      <article class="fps-guide-card"><span>01 · GAME SETTINGS</span><b>Reduce render load</b><p>Use Roblox Manual graphics and start low. Increase quality only if gameplay remains smooth.</p></article>
+      <article class="fps-guide-card"><span>02 · BACKGROUND</span><b>Keep headroom</b><p>Close apps you are done using. Avoid RAM booster apps and don't force-stop Android system services.</p></article>
+      <article class="fps-guide-card"><span>03 · THERMALS</span><b>Prevent heat buildup</b><p>Keep vents clear, avoid direct sunlight and pause if the phone becomes unusually hot.</p></article>
+      <article class="fps-guide-card"><span>04 · STORAGE</span><b>Leave free space</b><p>Keep internal storage comfortably free so Android has room for temporary files and updates.</p></article>
     </div>
-    <p id="fpsTips" class="fps-tips">Use Roblox's in-game graphics controls and keep the phone cool for steadier performance.</p>
-    <div class="fps-disclaimer"><b>What this test means</b><p>The 5-second test measures this app's browser animation only — it is not Roblox FPS. Real game readings and supported device information belong in Device + Shizuku. Fleasion does not promise a fixed FPS or change protected Roblox files.</p></div>
+    <div class="optimizer-actions"><button type="button" class="secondary" id="openRobloxSettings">Roblox app settings</button><button type="button" class="secondary" id="openDisplaySettings">Display settings</button><button type="button" class="secondary" id="refreshDeviceStats">Refresh device stats</button></div>
+    <div class="fps-metrics fps-benchmark">
+      <div class="fps-metric"><small>FLEASION ANIMATION TEST</small><b id="fpsResult">—</b><span id="fpsResultLabel">Not tested</span></div>
+      <button type="button" id="fpsTestBtn" class="primary fps-test">Run 5-second test</button>
+    </div>
+    <p id="fpsTips" class="fps-tips">4 GB mode: prioritize low in-game graphics, free memory headroom and stable temperatures.</p>
+    <div id="tuneupChecklist" class="tuneup-checklist"><b>Readiness checklist</b><p>Run smart tune-up to check available device information and show recommended next steps.</p></div>
+    <div class="fps-disclaimer"><b>Honest performance note</b><p>Fleasion does not promise a fixed 5–10% FPS increase. Android limits what third-party apps can change, and this scan does not measure Roblox FPS. It never disables thermal protection, kills system processes, modifies protected Roblox files or injects into the game.</p></div>
   </section>
   </section>
   <section id="profiles" class="panel">
@@ -95,5 +106,5 @@
 <dialog id="profileDialog"><form method="dialog" id="profileForm"><div class="modalhead"><div><span class="eyebrow">PROFILE SETTINGS</span><h2 id="profileDialogTitle">New profile</h2></div><button class="iconbtn" value="cancel" aria-label="Close">✕</button></div><label>Profile name<input id="profileName" maxlength="60" required placeholder="e.g. My setup"></label><div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveProfile" value="default">Save profile</button></div></form></dialog>
 <dialog id="ruleDialog"><form method="dialog" id="ruleForm"><div class="modalhead"><div><span class="eyebrow">RULE EDITOR</span><h2 id="ruleDialogTitle">Add rule</h2></div><button class="iconbtn" value="cancel" aria-label="Close">✕</button></div><label>Original asset ID<input id="originalId" inputmode="numeric" placeholder="123456789" required></label><label>Replacement target<input id="replacement" placeholder="Asset ID, HTTPS URL, or local path" required></label><label>Notes <span class="optional">(optional)</span><input id="ruleNotes" maxlength="120" placeholder="Add a short note"></label><div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveRule" value="default">Save rule</button></div></form></dialog>
 <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
-<script src="app.js?v=105"></script>
+<script src="app.js?v=106"></script>
 </body></html>
