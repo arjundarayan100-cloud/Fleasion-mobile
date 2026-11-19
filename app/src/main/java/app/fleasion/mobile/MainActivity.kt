@@ -2,262 +2,246 @@ package app.fleasion.mobile
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.ActivityManager
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.graphics.Typeface
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.os.PowerManager
-import android.os.StatFs
-import android.view.Gravity
-import android.view.View
-import android.view.WindowManager
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.ScrollView
-import android.widget.TextView
+import android.webkit.JavascriptInterface
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.widget.Toast
 import rikka.shizuku.Shizuku
-import java.util.Locale
 
 class MainActivity : Activity() {
-    private lateinit var statusText: TextView
-    private lateinit var permissionButton: Button
-    private lateinit var diagnosticsContainer: LinearLayout
+    private lateinit var webView: WebView
+    private var fileChooserCallback: ValueCallback<Array<Uri>>? = null
+    private var pendingExport: String? = null
+    private var pendingExportName: String = "fleasion-export.json"
 
-    private val binderReceivedListener = Shizuku.OnBinderReceivedListener { refreshStatus() }
-    private val binderDeadListener = Shizuku.OnBinderDeadListener { refreshStatus() }
+    private val binderReceivedListener = Shizuku.OnBinderReceivedListener { refreshPageStatus() }
+    private val binderDeadListener = Shizuku.OnBinderDeadListener { refreshPageStatus() }
     private val permissionResultListener =
         Shizuku.OnRequestPermissionResultListener { requestCode, grantResult ->
-            if (requestCode == REQUEST_CODE) {
-                refreshStatus()
-                statusText.text = if (grantResult == PackageManager.PERMISSION_GRANTED) {
-                    "Shizuku permission granted. No device changes have been made."
-                } else {
-                    "Permission not granted. Fleasion remains in standard mode."
-                }
+            if (requestCode == SHIZUKU_REQUEST_CODE) {
+                refreshPageStatus()
+                Toast.makeText(
+                    this,
+                    if (grantResult == PackageManager.PERMISSION_GRANTED)
+                        "Shizuku permission granted"
+                    else "Shizuku permission not granted",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        buildScreen()
+        webView = WebView(this)
+        webView.setBackgroundColor(0xFF080D16.toInt())
+        webView.settings.apply {
+            javaScriptEnabled = true
+            domStorageEnabled = true
+            allowFileAccess = true
+            allowContentAccess = true
+            javaScriptCanOpenWindowsAutomatically = false
+            setSupportMultipleWindows(false)
+            mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW
+        }
+        webView.addJavascriptInterface(NativeBridge(), "FleasionNative")
+        webView.webViewClient = object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                val uri = request.url
+                if (uri.scheme == "file" || uri.scheme == "about") return false
+                if (uri.scheme == "https" || uri.scheme == "http") {
+                    runCatching { startActivity(Intent(Intent.ACTION_VIEW, uri)) }
+                        .onFailure { Toast.makeText(this@MainActivity, "No browser available", Toast.LENGTH_SHORT).show() }
+                    return true
+                }
+                return true
+            }
+        }
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onShowFileChooser(
+                view: WebView,
+                callback: ValueCallback<Array<Uri>>,
+                params: FileChooserParams
+            ): Boolean {
+                fileChooserCallback?.onReceiveValue(null)
+                fileChooserCallback = callback
+                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "application/json"
+                    putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/json", "text/json", "text/plain"))
+                }
+                return try {
+                    startActivityForResult(intent, IMPORT_REQUEST_CODE)
+                    true
+                } catch (_: Exception) {
+                    fileChooserCallback = null
+                    callback.onReceiveValue(null)
+                    false
+                }
+            }
+        }
+        setContentView(webView)
         Shizuku.addBinderReceivedListener(binderReceivedListener)
         Shizuku.addBinderDeadListener(binderDeadListener)
         Shizuku.addRequestPermissionResultListener(permissionResultListener)
-        refreshStatus()
-        refreshDiagnostics()
+
+        if (savedInstanceState != null && webView.restoreState(savedInstanceState) != null) {
+            // Restore the existing workspace view.
+        } else {
+            webView.loadUrl("file:///android_asset/index.html")
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        if (::statusText.isInitialized) refreshStatus()
-        if (::diagnosticsContainer.isInitialized) refreshDiagnostics()
+        if (::webView.isInitialized) refreshPageStatus()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        if (::webView.isInitialized) webView.saveState(outState)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            IMPORT_REQUEST_CODE -> {
+                val result = if (resultCode == RESULT_OK && data?.data != null)
+                    arrayOf(data.data!!) else null
+                fileChooserCallback?.onReceiveValue(result)
+                fileChooserCallback = null
+            }
+            EXPORT_REQUEST_CODE -> {
+                val uri = if (resultCode == RESULT_OK) data?.data else null
+                val content = pendingExport
+                if (uri != null && content != null) {
+                    runCatching {
+                        contentResolver.openOutputStream(uri)?.use { stream ->
+                            stream.write(content.toByteArray(Charsets.UTF_8))
+                        } ?: error("Could not open the selected document")
+                    }.onSuccess {
+                        Toast.makeText(this, "JSON file saved", Toast.LENGTH_SHORT).show()
+                    }.onFailure {
+                        Toast.makeText(this, "Export failed: ${it.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
+                pendingExport = null
+            }
+        }
+    }
+
+    override fun onBackPressed() {
+        if (::webView.isInitialized && webView.canGoBack()) webView.goBack()
+        else super.onBackPressed()
     }
 
     override fun onDestroy() {
         Shizuku.removeBinderReceivedListener(binderReceivedListener)
         Shizuku.removeBinderDeadListener(binderDeadListener)
         Shizuku.removeRequestPermissionResultListener(permissionResultListener)
+        fileChooserCallback?.onReceiveValue(null)
+        if (::webView.isInitialized) {
+            webView.removeJavascriptInterface("FleasionNative")
+            webView.destroy()
+        }
         super.onDestroy()
     }
 
-    private fun buildScreen() {
-        val page = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(20), dp(26), dp(20), dp(30))
-            setBackgroundColor(0xFF080D16.toInt())
-        }
-        val scroll = ScrollView(this).apply { isFillViewport = true; addView(page) }
-
-        page.addView(text("FLEASION  /  MOBILE", 12f, 0xFF52E3DF.toInt(), true))
-        page.addView(text("Your device.\nYour control.", 31f, 0xFFFFFFFF.toInt(), true).apply {
-            setPadding(0, dp(10), 0, dp(5))
-        })
-        page.addView(text("UNIVERSAL ANDROID COMPANION  ·  0.6.0 ALPHA", 10f, 0xFF91A5B9.toInt(), true)
-            .apply { setPadding(0, 0, 0, dp(18)) })
-
-        page.addView(cardTitle("DEVICE OVERVIEW"))
-        page.addView(infoLine("Manufacturer", Build.MANUFACTURER.orUnknown()))
-        page.addView(infoLine("Model", Build.MODEL.orUnknown()))
-        page.addView(infoLine("Android version", "Android ${Build.VERSION.RELEASE.orUnknown()}"))
-        page.addView(infoLine("API level", Build.VERSION.SDK_INT.toString()))
-        page.addView(infoLine("Build", Build.DISPLAY.orUnknown()))
-        page.addView(infoLine("Supported ABIs", Build.SUPPORTED_ABIS.joinToString().ifBlank { "Unknown" }))
-
-        page.addView(cardTitle("LIVE DEVICE DIAGNOSTICS"))
-        page.addView(text(
-            "Read-only information from Android. These values describe device capability and current conditions; they are not Roblox FPS measurements.",
-            12f, 0xFF91A5B9.toInt(), false
-        ).apply { setPadding(0, 0, 0, dp(8)) })
-        diagnosticsContainer = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        page.addView(diagnosticsContainer)
-        page.addView(Button(this).apply {
-            text = "Refresh diagnostics"
-            isAllCaps = false
-            setOnClickListener { refreshDiagnostics() }
-        })
-
-        page.addView(cardTitle("SHIZUKU CONNECTION"))
-        statusText = text("Checking Shizuku…", 14f, 0xFFE8F4FF.toInt(), false)
-        statusText.setPadding(0, dp(7), 0, dp(12))
-        page.addView(statusText)
-        permissionButton = Button(this).apply {
-            text = "Request Shizuku permission"
-            isAllCaps = false
-            setOnClickListener { requestShizukuPermission() }
-        }
-        page.addView(permissionButton)
-        page.addView(Button(this).apply {
-            text = "Shizuku setup guide"
-            isAllCaps = false
-            setOnClickListener {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://shizuku.rikka.app/")))
-            }
-        })
-
-        page.addView(cardTitle("CAPABILITY-AWARE BY DESIGN"))
-        page.addView(text(
-            "Fleasion checks Android version, hardware and service availability before exposing future controls. Unsupported features stay unavailable instead of pretending to work. Standard features remain usable without Shizuku.",
-            13f, 0xFFD0DCE8.toInt(), false
-        ).apply { setPadding(0, dp(5), 0, dp(8)) })
-        page.addView(text(
-            "Safety: this alpha only reads device information and checks Shizuku status. It does not change system settings, stop other apps, access protected app data, modify Roblox files, inject code or automate gameplay. No FPS increase is promised.",
-            11f, 0xFF91A5B9.toInt(), false
-        ).apply { setPadding(0, dp(16), 0, 0) })
-        setContentView(scroll)
-    }
-
-    private fun refreshDiagnostics() {
-        if (!::diagnosticsContainer.isInitialized) return
-        diagnosticsContainer.removeAllViews()
-
-        val activityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
-        val memory = ActivityManager.MemoryInfo()
-        activityManager.getMemoryInfo(memory)
-        addDiagnostic("Available memory", formatBytes(memory.availMem))
-        addDiagnostic("Total memory", formatBytes(memory.totalMem))
-        addDiagnostic("Memory pressure", if (memory.lowMemory) "Low-memory condition reported" else "No low-memory warning")
-
-        val display = (getSystemService(WINDOW_SERVICE) as WindowManager).defaultDisplay
-        addDiagnostic("Current display rate", String.format(Locale.US, "%.1f Hz", display.refreshRate))
-        val modes = runCatching { display.supportedModes.map { it.refreshRate }.distinct().sorted() }
-            .getOrDefault(emptyList())
-        addDiagnostic("Reported display modes", if (modes.isEmpty()) "Not reported" else
-            modes.joinToString { String.format(Locale.US, "%.0f Hz", it) })
-
-        val batteryIntent = registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-        val level = batteryIntent?.getIntExtra("level", -1) ?: -1
-        val scale = batteryIntent?.getIntExtra("scale", -1) ?: -1
-        addDiagnostic("Battery level", if (level >= 0 && scale > 0) "${(level * 100) / scale}%" else "Unavailable")
-
-        val storage = runCatching { StatFs(Environment.getDataDirectory().absolutePath) }.getOrNull()
-        addDiagnostic("Available internal storage", storage?.let { formatBytes(it.availableBytes) } ?: "Unavailable")
-
-        val thermal = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val power = getSystemService(POWER_SERVICE) as PowerManager
-            runCatching { thermalLabel(power.currentThermalStatus) }.getOrDefault("Unavailable")
-        } else "Not exposed on this Android version"
-        addDiagnostic("Thermal status", thermal)
-    }
-
-    private fun thermalLabel(status: Int): String = when (status) {
-        PowerManager.THERMAL_STATUS_NONE -> "No thermal throttling reported"
-        PowerManager.THERMAL_STATUS_LIGHT -> "Light"
-        PowerManager.THERMAL_STATUS_MODERATE -> "Moderate"
-        PowerManager.THERMAL_STATUS_SEVERE -> "Severe"
-        PowerManager.THERMAL_STATUS_CRITICAL -> "Critical"
-        PowerManager.THERMAL_STATUS_EMERGENCY -> "Emergency"
-        PowerManager.THERMAL_STATUS_SHUTDOWN -> "Shutdown threshold"
-        else -> "Unknown"
-    }
-
-    private fun addDiagnostic(label: String, value: String) {
-        diagnosticsContainer.addView(infoLine(label, value))
-    }
-
-    private fun formatBytes(bytes: Long): String {
-        if (bytes < 0) return "Unavailable"
-        val units = arrayOf("B", "KB", "MB", "GB", "TB")
-        var amount = bytes.toDouble()
-        var unit = 0
-        while (amount >= 1024 && unit < units.lastIndex) { amount /= 1024; unit++ }
-        return String.format(Locale.US, "%.1f %s", amount, units[unit])
-    }
-
-    private fun refreshStatus() {
+    private fun shizukuState(): String {
         val connected = runCatching { Shizuku.pingBinder() }.getOrDefault(false)
-        val granted = connected && runCatching {
+        if (!connected) return "Shizuku service not detected"
+        val granted = runCatching {
             Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
         }.getOrDefault(false)
-        statusText.text = when {
-            !connected -> "Not connected. Start Shizuku, then return here."
-            granted -> "Connected · permission granted"
-            else -> "Connected · permission not granted"
+        return if (granted) "Permission granted" else "Connected · permission needed"
+    }
+
+    private fun refreshPageStatus() {
+        if (!::webView.isInitialized) return
+        webView.post {
+            webView.evaluateJavascript(
+                "if (window.refreshNativeShizuku) window.refreshNativeShizuku();",
+                null
+            )
         }
-        permissionButton.isEnabled = connected && !granted
-        permissionButton.text = if (granted) "Permission granted" else "Request Shizuku permission"
     }
 
     private fun requestShizukuPermission() {
-        if (runCatching { Shizuku.isPreV11() }.getOrDefault(true)) {
-            statusText.text = "This Shizuku service version is not supported. Update Shizuku and retry."
-            return
-        }
         if (!runCatching { Shizuku.pingBinder() }.getOrDefault(false)) {
-            statusText.text = "Shizuku is not running. Start it first, then retry."
-            refreshStatus()
+            AlertDialog.Builder(this)
+                .setTitle("Shizuku is not running")
+                .setMessage("Start Shizuku using its official setup guide, then return to Fleasion.")
+                .setPositiveButton("OK", null)
+                .show()
             return
         }
         if (runCatching { Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED }.getOrDefault(false)) {
-            refreshStatus()
+            refreshPageStatus()
+            Toast.makeText(this, "Permission is already granted", Toast.LENGTH_SHORT).show()
             return
         }
         AlertDialog.Builder(this)
             .setTitle("Allow Fleasion to use Shizuku?")
             .setMessage(
-                "This grants Fleasion the Shizuku permission needed for explicitly requested " +
-                    "Android operations. This alpha currently performs read-only diagnostics " +
-                    "and does not change system settings or other apps. You can deny access " +
-                    "and continue using standard features."
+                "This permission is optional. The current build only checks the connection and reads device diagnostics. " +
+                "It does not change Android settings, stop apps, modify Roblox files or automate gameplay."
             )
             .setNegativeButton("Not now", null)
             .setPositiveButton("Continue") { _, _ ->
-                runCatching { Shizuku.requestPermission(REQUEST_CODE) }
+                runCatching { Shizuku.requestPermission(SHIZUKU_REQUEST_CODE) }
                     .onFailure {
-                        statusText.text = "Could not request permission: ${it.message ?: "unknown error"}"
+                        Toast.makeText(this, "Permission request failed: ${it.message}", Toast.LENGTH_LONG).show()
                     }
             }
             .show()
     }
 
-    private fun cardTitle(value: String) = text(value, 11f, 0xFF52E3DF.toInt(), true)
-        .apply { setPadding(0, dp(22), 0, dp(8)) }
-
-    private fun infoLine(label: String, value: String): View {
-        val row = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-            setPadding(0, dp(7), 0, dp(7))
+    private fun launchExport(filename: String, content: String) {
+        pendingExportName = filename.replace(Regex("[^A-Za-z0-9._-]"), "_").take(90)
+            .ifBlank { "fleasion-export.json" }
+        pendingExport = content
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/json"
+            putExtra(Intent.EXTRA_TITLE, pendingExportName)
         }
-        row.addView(text(label, 12f, 0xFF91A5B9.toInt(), false), LinearLayout.LayoutParams(0, -2, 1f))
-        row.addView(text(value, 12f, 0xFFFFFFFF.toInt(), true), LinearLayout.LayoutParams(0, -2, 1.35f))
-        return row
+        try {
+            startActivityForResult(intent, EXPORT_REQUEST_CODE)
+        } catch (_: Exception) {
+            pendingExport = null
+            Toast.makeText(this, "No file picker available", Toast.LENGTH_SHORT).show()
+        }
     }
 
-    private fun text(value: String, size: Float, color: Int, bold: Boolean) =
-        TextView(this).apply {
-            text = value
-            textSize = size
-            setTextColor(color)
-            if (bold) typeface = Typeface.DEFAULT_BOLD
+    inner class NativeBridge {
+        @JavascriptInterface
+        fun getShizukuState(): String = shizukuState()
+
+        @JavascriptInterface
+        fun requestShizukuPermission() {
+            runOnUiThread { this@MainActivity.requestShizukuPermission() }
         }
 
-    private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
-    private fun String?.orUnknown(): String = this?.takeIf { it.isNotBlank() } ?: "Unknown"
+        @JavascriptInterface
+        fun saveJsonFile(filename: String, content: String) {
+            if (content.length > MAX_EXPORT_CHARS) {
+                runOnUiThread { Toast.makeText(this@MainActivity, "Export is too large", Toast.LENGTH_SHORT).show() }
+                return
+            }
+            runOnUiThread { launchExport(filename, content) }
+        }
+    }
 
-    companion object { private const val REQUEST_CODE = 7301 }
+    companion object {
+        private const val SHIZUKU_REQUEST_CODE = 7301
+        private const val IMPORT_REQUEST_CODE = 7302
+        private const val EXPORT_REQUEST_CODE = 7303
+        private const val MAX_EXPORT_CHARS = 2_000_000
+    }
 }
