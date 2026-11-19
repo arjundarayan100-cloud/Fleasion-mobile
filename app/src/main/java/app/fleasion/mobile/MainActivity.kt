@@ -6,6 +6,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Build
+import android.os.Environment
+import android.os.PowerManager
+import android.os.StatFs
+import android.app.ActivityManager
+import android.view.WindowManager
+import org.json.JSONObject
 import android.webkit.JavascriptInterface
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
@@ -162,6 +169,51 @@ class MainActivity : Activity() {
         return if (granted) "Permission granted" else "Connected · permission needed"
     }
 
+    private fun deviceInfoJson(): String {
+        val manager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
+        val memory = ActivityManager.MemoryInfo()
+        manager.getMemoryInfo(memory)
+        val display = (getSystemService(WINDOW_SERVICE) as WindowManager).defaultDisplay
+        val storage = runCatching { StatFs(Environment.getDataDirectory().absolutePath).availableBytes }.getOrDefault(-1L)
+        val thermal = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val power = getSystemService(POWER_SERVICE) as PowerManager
+            runCatching { thermalLabel(power.currentThermalStatus) }.getOrDefault("Unavailable")
+        } else "Not exposed"
+        return JSONObject()
+            .put("platform", "Android")
+            .put("model", "${Build.MANUFACTURER} ${Build.MODEL}".trim())
+            .put("android", "Android ${Build.VERSION.RELEASE} · API ${Build.VERSION.SDK_INT}")
+            .put("cores", Runtime.getRuntime().availableProcessors().toString())
+            .put("memoryHint", "About ${memory.totalMem / (1024L * 1024L * 1024L)} GB")
+            .put("totalRam", formatBytes(memory.totalMem))
+            .put("availableRam", formatBytes(memory.availMem))
+            .put("screen", "${resources.displayMetrics.widthPixels} × ${resources.displayMetrics.heightPixels} · ${resources.displayMetrics.densityDpi} dpi")
+            .put("refreshRate", String.format(java.util.Locale.US, "%.1f Hz", display.refreshRate))
+            .put("freeStorage", formatBytes(storage))
+            .put("thermal", thermal)
+            .toString()
+    }
+
+    private fun formatBytes(bytes: Long): String {
+        if (bytes < 0) return "Unavailable"
+        val units = arrayOf("B", "KB", "MB", "GB", "TB")
+        var amount = bytes.toDouble()
+        var unit = 0
+        while (amount >= 1024 && unit < units.lastIndex) { amount /= 1024; unit++ }
+        return String.format(java.util.Locale.US, "%.1f %s", amount, units[unit])
+    }
+
+    private fun thermalLabel(status: Int): String = when (status) {
+        PowerManager.THERMAL_STATUS_NONE -> "Normal"
+        PowerManager.THERMAL_STATUS_LIGHT -> "Light"
+        PowerManager.THERMAL_STATUS_MODERATE -> "Moderate"
+        PowerManager.THERMAL_STATUS_SEVERE -> "Severe"
+        PowerManager.THERMAL_STATUS_CRITICAL -> "Critical"
+        PowerManager.THERMAL_STATUS_EMERGENCY -> "Emergency"
+        PowerManager.THERMAL_STATUS_SHUTDOWN -> "Shutdown threshold"
+        else -> "Unknown"
+    }
+
     private fun refreshPageStatus() {
         if (!::webView.isInitialized) return
         webView.post {
@@ -222,6 +274,9 @@ class MainActivity : Activity() {
     inner class NativeBridge {
         @JavascriptInterface
         fun getShizukuState(): String = shizukuState()
+
+        @JavascriptInterface
+        fun getDeviceInfo(): String = deviceInfoJson()
 
         @JavascriptInterface
         fun requestShizukuPermission() {
