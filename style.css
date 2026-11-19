@@ -237,3 +237,26 @@ body.light .fps-metric span,body.light .fps-guide-card p,body.light .fps-disclai
 body.light .fps-profile-row select{background:#fff;color:var(--text);border-color:#d8e5e9}
 @media(min-width:560px){.fps-guide-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.menu-dialog{width:360px}}
 @media(max-width:380px){.version-pill{display:none}.fps-command{padding:15px}.fps-metric{padding:10px}}
+
+/* FPS Lab optimizer dashboard */
+.optimizer-hero{display:flex;align-items:center;gap:22px;padding:22px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(135deg,rgba(82,227,223,.10),rgba(82,227,223,.025));margin:18px 0}
+.optimizer-orbit{width:112px;height:112px;flex:0 0 112px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(82,227,223,.4);box-shadow:0 0 0 8px rgba(82,227,223,.045),0 0 35px rgba(82,227,223,.10)}
+.optimizer-core{width:82px;height:82px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(145deg,#183a48,#0b1724);border:1px solid rgba(82,227,223,.55);color:#52e3df;font-size:28px;font-weight:800}
+.optimizer-core small{font-size:9px;letter-spacing:1.6px}
+.optimizer-copy{min-width:0;flex:1}.optimizer-copy>b{font-size:17px}.optimizer-copy p{color:var(--muted);font-size:12px;line-height:1.55;margin:6px 0 13px}
+.optimizer-copy button{min-height:42px}.fps-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:15px 0}
+.fps-metric{min-width:0;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.fps-metric small{display:block;font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:700}
+.fps-metric>b{display:block;font-size:20px;margin:8px 0 4px;overflow-wrap:anywhere}
+.fps-metric>span{display:block;font-size:10px;color:var(--muted);line-height:1.4}
+.fps-benchmark{align-items:center}.fps-benchmark .fps-test{width:auto;min-width:145px}
+.optimizer-actions{display:flex;flex-wrap:wrap;gap:8px;margin:15px 0}
+.optimizer-actions button{flex:1;min-width:130px}
+.tuneup-checklist{margin:15px 0;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+.tuneup-checklist> b{display:block;margin-bottom:12px}
+.tuneup-checklist>p{font-size:12px;color:var(--muted);line-height:1.55;margin:0}
+.tuneup-row{display:flex;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.tuneup-row>span{width:22px;height:22px;flex:0 0 22px;border-radius:50%;display:grid;place-items:center;background:rgba(82,227,223,.13);color:var(--cyan);font-weight:800}
+.tuneup-row b,.tuneup-row small{display:block}.tuneup-row b{font-size:12px}.tuneup-row small{font-size:11px;color:var(--muted);line-height:1.45;margin-top:3px}
+.tuneup-checklist .tuneup-native{border-top:1px solid var(--line);padding-top:12px;margin-top:8px}
+@media(max-width:520px){.optimizer-hero{gap:14px;padding:15px}.optimizer-orbit{width:82px;height:82px;flex-basis:82px}.optimizer-core{width:62px;height:62px;font-size:22px}.optimizer-copy>b{font-size:14px}.fps-metrics{gap:7px}.fps-metric{padding:10px}.fps-metric>b{font-size:17px}.fps-metric small{font-size:8px}.fps-benchmark{grid-template-columns:1fr}.fps-benchmark .fps-test{width:100%}}
