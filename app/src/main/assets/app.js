@@ -464,9 +464,18 @@ function refreshDeviceSnapshot() {
   $("#deviceScreen").textContent = window.screen ? screen.width + " × " + screen.height + " · " + (window.devicePixelRatio || 1) + "×" : "Unavailable";
 }
 const refreshDeviceButton = $("#refreshDevice");
-if (refreshDeviceButton) refreshDeviceButton.addEventListener("click", () => { refreshDeviceSnapshot(); toast("Device snapshot refreshed"); });
+if (refreshDeviceButton) refreshDeviceButton.addEventListener("click", () => { refreshDeviceSnapshot(); refreshNativeDeviceSnapshot(); toast("Device snapshot refreshed"); });
 refreshDeviceSnapshot();
 
+function refreshNativeDeviceSnapshot() {
+  if (!window.FleasionNative || typeof window.FleasionNative.getDeviceInfo !== "function") return;
+  try {
+    const info = JSON.parse(window.FleasionNative.getDeviceInfo());
+    const fields = { devicePlatform: info.platform, deviceCores: info.cores, deviceMemory: info.memoryHint, deviceScreen: info.screen, deviceModel: info.model, deviceAndroid: info.android, deviceTotalRam: info.totalRam, deviceAvailableRam: info.availableRam, deviceRefresh: info.refreshRate, deviceStorage: info.freeStorage, deviceThermal: info.thermal };
+    for (const [id, value] of Object.entries(fields)) { const node = document.getElementById(id); if (node && value !== undefined) node.textContent = String(value); }
+  } catch (_) {}
+}
+refreshNativeDeviceSnapshot();
 
 // Fleasion 0.7.0 — PC-style mobile modules. All data remains local.
 const FLAGS_KEY = "fleasion-mobile-fflags-v1";
@@ -620,5 +629,6 @@ if (nativePermissionButton) nativePermissionButton.addEventListener("click", () 
   window.FleasionNative.requestShizukuPermission();
 });
 window.addEventListener("focus", refreshNativeShizuku);
+window.addEventListener("focus", refreshNativeDeviceSnapshot);
 document.addEventListener("visibilitychange", refreshNativeShizuku);
 refreshNativeShizuku();
