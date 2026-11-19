@@ -41,7 +41,7 @@ main{width:min(100% - 30px,760px);margin:0 auto;padding:25px 0 32px}
 .stat-card b,.stat-card small{display:block}
 .stat-card b{font-size:22px;line-height:1.1}
 .stat-card small{margin-top:4px;color:var(--muted);font-size:9px;font-weight:800;letter-spacing:.13em}
-.tabs{position:sticky;top:70px;z-index:4;display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:0 0 22px;padding:6px;border:1px solid var(--line);border-radius:16px;background:#0c1522ed;backdrop-filter:blur(16px)}
+.tabs{position:sticky;top:70px;z-index:4;display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:0 0 22px;padding:6px;border:1px solid var(--line);border-radius:16px;background:#0c1522ed;backdrop-filter:blur(16px)}
 .tab{display:flex;align-items:center;justify-content:center;gap:8px;min-height:43px;border:0;border-radius:11px;background:transparent;color:var(--muted);font-size:12px;font-weight:750}
 .tab span{font-size:16px}
 .tab.active{background:linear-gradient(120deg,#65ece5,#36cbd0);color:#06151b;box-shadow:0 5px 18px #52e3df24}
@@ -169,3 +169,71 @@ body.light label input{background:#f5f9fa;border-color:#d8e5e9;color:#10232c}
 body.light .fps-panel{background:linear-gradient(145deg,#e5f6f4,#edf4fa);border-color:#c6e5e1}
 body.light .fps-tips{color:#456a70}
 body.light .fps-profile-row select{background:#fff;color:var(--text);border-color:#d8e5e9}
+
+.ff-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;padding:13px;border:1px solid var(--line);border-radius:15px;background:var(--panel)}
+.ff-profile-label{margin:0;color:var(--muted);font-size:10px}
+.ff-toolbar select{flex:1;min-width:130px;min-height:40px;padding:7px 9px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--text);font-size:11px}
+.ff-toolbar button{min-height:40px;padding:8px 10px;font-size:10px}
+.ff-editor-card{padding:15px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,#142235,#101a29)}
+.ff-editor-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px}
+.ff-editor-head b,.ff-editor-head small{display:block}
+.ff-editor-head b{font-size:12px}
+.ff-editor-head small{margin-top:4px;color:var(--muted);font-size:10px}
+#ffEditor{display:block;width:100%;min-height:230px;resize:vertical;padding:13px;border:1px solid #30465a;border-radius:12px;background:#091320;color:#d8f8f5;font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;tab-size:2}
+.ff-actions{justify-content:flex-end;margin-top:10px}
+.ff-toolbar button:disabled{opacity:.4;cursor:not-allowed}
+body.light .ff-editor-card{background:linear-gradient(145deg,#fff,#f4f9fa)}
+body.light #ffEditor{background:#f5f9fa;color:#17313d;border-color:#d8e5e9}
+@media(max-width:560px){.ff-toolbar{align-items:stretch}.ff-profile-label{width:100%}.ff-toolbar select{min-width:100%}.ff-toolbar button{flex:1}.ff-actions button{flex:1}}
+
+
+/* Fleasion Mobile 0.7 redesign: hamburger workspace + FPS Lab */
+.menu-trigger{font-size:21px;line-height:1}
+.menu-dialog{position:fixed;inset:0 0 0 auto;margin:0;width:min(88vw,360px);height:100dvh;max-height:none;padding:22px 18px;border:1px solid var(--line);border-right:0;border-radius:22px 0 0 22px;background:linear-gradient(165deg,#142638,#0b1421 70%);color:var(--text);box-shadow:-24px 0 70px #0008}
+.menu-dialog::backdrop{background:#02070dcc;backdrop-filter:blur(7px)}
+.menu-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 2px 20px;border-bottom:1px solid var(--line)}
+.menu-head h2{margin:4px 0 0;font-size:23px;letter-spacing:-.04em}
+.menu-nav{display:grid;gap:8px;margin-top:18px}
+.menu-nav .tab{display:flex;justify-content:flex-start;align-items:center;gap:14px;min-height:65px;padding:10px 13px;border:1px solid transparent;border-radius:15px;background:#ffffff06;color:var(--text);text-align:left}
+.menu-nav .tab>span:first-child{width:35px;height:35px;display:grid;place-items:center;border-radius:11px;background:#52e3df17;color:var(--cyan);font-size:20px}
+.menu-nav .tab>span:last-child{display:grid;gap:3px}
+.menu-nav .tab b{font-size:13px}
+.menu-nav .tab small{color:var(--muted);font-size:10px;font-weight:500}
+.menu-nav .tab.active{border-color:#52e3df66;background:linear-gradient(110deg,#52e3df20,#52e3df08);color:var(--text);box-shadow:inset 3px 0 var(--cyan)}
+.menu-nav .tab.active>span:first-child{background:var(--cyan);color:#07151c}
+.menu-foot{position:absolute;bottom:max(18px,env(safe-area-inset-bottom));left:20px;color:var(--muted);font-size:10px}
+.dashboard-panel{display:none}
+.dashboard-panel.active{display:block}
+.fps-command{margin:24px 0 8px;padding:19px;border:1px solid #2b5961;border-radius:22px;background:radial-gradient(ellipse at 100% 0%,#52e3df1a,transparent 45%),linear-gradient(145deg,#112635,#0d1725 72%);box-shadow:var(--shadow)}
+.fps-command .fps-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.fps-command .fps-panel-head h2{margin:7px 0 5px;font-size:25px;letter-spacing:-.045em}
+.fps-command .fps-panel-head p{max-width:310px;margin:0;color:var(--muted);font-size:11px;line-height:1.55}
+.fps-chip{flex-shrink:0;padding:6px 9px;border:1px solid #52e3df55;border-radius:30px;color:var(--cyan);font-size:9px;font-weight:900;letter-spacing:.12em}
+.fps-metrics{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:17px 0 11px}
+.fps-metric{min-width:0;padding:13px;border:1px solid #294354;border-radius:15px;background:#07142188}
+.fps-metric small,.fps-metric b,.fps-metric span{display:block}
+.fps-metric small{color:var(--muted);font-size:8px;font-weight:850;letter-spacing:.12em}
+.fps-metric b{margin:5px 0 3px;color:var(--cyan);font-size:23px;letter-spacing:-.04em}
+.fps-metric span{color:#a4bac9;font-size:9px;line-height:1.4}
+.fps-command .fps-test{width:100%;margin:0 0 12px}
+.fps-profile-row{display:grid;gap:7px;margin:12px 0}
+.fps-profile-row label{margin:0;color:#b8cbd8;font-size:10px}
+.fps-profile-row select,.ff-toolbar select{width:100%;min-height:44px;padding:9px 12px;border:1px solid #30495d;border-radius:12px;background:#101f2e;color:var(--text);font:inherit;font-size:12px}
+.fps-guide-grid{display:grid;grid-template-columns:1fr;gap:8px;margin:14px 0}
+.fps-guide-card{padding:12px 13px;border:1px solid #263d50;border-radius:14px;background:#ffffff05}
+.fps-guide-card span{display:block;color:var(--cyan);font-size:8px;font-weight:900;letter-spacing:.14em}
+.fps-guide-card b{display:block;margin-top:4px;font-size:12px}
+.fps-guide-card p{margin:4px 0 0;color:var(--muted);font-size:10px;line-height:1.5}
+.fps-tips{margin:12px 0 0;padding:12px;border-left:2px solid var(--cyan);border-radius:0 11px 11px 0;background:#52e3df0d;color:#c2d8e4;font-size:10px;line-height:1.6}
+.fps-disclaimer{margin-top:12px;padding:12px;border:1px solid #30465a;border-radius:13px;background:#091522}
+.fps-disclaimer b{font-size:10px;color:#dcecf5}
+.fps-disclaimer p{margin:4px 0 0;color:var(--muted);font-size:9px;line-height:1.55}
+body.light .menu-dialog{background:linear-gradient(165deg,#fff,#eef7f8);border-color:#d8e5e9}
+body.light .menu-nav .tab{background:#f3f8f9}
+body.light .menu-nav .tab.active{background:#e4f7f5}
+body.light .fps-command{background:linear-gradient(145deg,#e5f8f5,#f5f9fc);border-color:#c7e7e4}
+body.light .fps-metric,body.light .fps-guide-card,body.light .fps-disclaimer{background:#ffffff;border-color:#d8e5e9}
+body.light .fps-metric span,body.light .fps-guide-card p,body.light .fps-disclaimer p{color:#647d89}
+body.light .fps-profile-row select{background:#fff;color:var(--text);border-color:#d8e5e9}
+@media(min-width:560px){.fps-guide-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.menu-dialog{width:360px}}
+@media(max-width:380px){.version-pill{display:none}.fps-command{padding:15px}.fps-metric{padding:10px}}
