@@ -427,3 +427,21 @@ if ("serviceWorker" in navigator) {
     toast("Offline update could not be registered. The app still works online.");
   }));
 }
+
+// Fleasion 0.6.0 device snapshot. Browser-exposed values only; no privileged claims.
+function refreshDeviceSnapshot() {
+  const ua = navigator.userAgent || "";
+  let platform = "Unknown browser";
+  if (/Android/i.test(ua)) platform = "Android";
+  else if (/iPhone|iPad|iPod/i.test(ua)) platform = "iOS";
+  else if (/Windows/i.test(ua)) platform = "Windows";
+  else if (/Mac OS/i.test(ua)) platform = "macOS";
+  else if (/Linux/i.test(ua)) platform = "Linux";
+  $("#devicePlatform").textContent = platform;
+  $("#deviceCores").textContent = navigator.hardwareConcurrency ? String(navigator.hardwareConcurrency) : "Unavailable";
+  $("#deviceMemory").textContent = navigator.deviceMemory ? "About " + navigator.deviceMemory + " GB" : "Not exposed";
+  $("#deviceScreen").textContent = window.screen ? screen.width + " × " + screen.height + " · " + (window.devicePixelRatio || 1) + "×" : "Unavailable";
+}
+const refreshDeviceButton = $("#refreshDevice");
+if (refreshDeviceButton) refreshDeviceButton.addEventListener("click", () => { refreshDeviceSnapshot(); toast("Device snapshot refreshed"); });
+refreshDeviceSnapshot();
