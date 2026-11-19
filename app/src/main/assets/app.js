@@ -279,6 +279,10 @@ $("#ruleForm").addEventListener("submit", (event) => {
 });
 
 function downloadJson(value, filename) {
+  if (window.FleasionNative && typeof window.FleasionNative.saveJsonFile === "function") {
+    window.FleasionNative.saveJsonFile(filename, JSON.stringify(value, null, 2));
+    return;
+  }
   const blob = new Blob([JSON.stringify(value, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -564,7 +568,7 @@ $("#joinPlace").addEventListener("click", () => {
   const id = $("#placeId").value.trim();
   if (!/^[0-9]{1,24}$/.test(id)) return toast("Enter a numeric Place ID");
   const url = "https://www.roblox.com/games/" + id;
-  window.open(url, "_blank", "noopener,noreferrer");
+  window.location.href = url;
   $("#joinStatus").textContent = "Opened the public Roblox experience page for Place ID " + id + ".";
 });
 function applyUiSettings(settings) {
