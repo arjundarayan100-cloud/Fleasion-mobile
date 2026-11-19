@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.PowerManager
 import android.os.StatFs
+import android.provider.Settings
 import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
@@ -153,7 +154,7 @@ class MainActivity : Activity() {
             setOnClickListener {
                 runCatching {
                     startActivity(Intent(
-                        Intent.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
                         Uri.parse("package:com.roblox.client")
                     ))
                 }.onFailure {
