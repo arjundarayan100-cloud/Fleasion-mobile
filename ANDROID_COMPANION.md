@@ -1,32 +1,30 @@
-# Fleasion Mobile — Native Android companion (0.6.0 alpha02)
+# Fleasion Mobile — Native Android companion (0.8.0 alpha01)
 
-The repository contains a native Android companion alongside the existing 0.5.0 web companion.
+This native Android app is the Shizuku-capable companion to the Fleasion Mobile PWA.
 
-## Compatibility strategy
+## Compatibility
 
-- Minimum native app version: Android 7.0 (API 24), required by the selected Shizuku integration baseline.
-- Target SDK: 35.
+- Minimum Android: 7.0 (API 24).
+- Compile / target SDK: 35.
+- Kotlin / Java target: 17.
 - Shizuku API: 13.1.5.
-- Runtime capability checks are used. A feature absent on an OS version or device is shown as unavailable rather than assumed to work.
-- The PWA remains available on older Android versions through a supported browser, even where the native app cannot be installed.
+- Shizuku is optional. Read-only diagnostics remain available without it.
+- Shizuku does not grant root automatically; ADB-backed and root-backed modes have different capabilities.
 
-Android does not provide one universal API for every performance setting. Vendor, OS, hardware and Shizuku's ADB-backed versus root mode affect available operations. Shizuku does not grant root automatically.
+## Included in this alpha
 
-## Current native alpha
-
-- Manufacturer, model, Android release, API level, build and supported ABI identification.
-- Read-only diagnostics for memory, display refresh-rate modes, battery level, internal storage and thermal status where Android exposes it.
-- Shizuku binder connection detection.
-- Explicit, user-initiated Shizuku permission request.
-- Standard-mode operation when Shizuku is absent or not authorized.
-
-Diagnostics are not an in-game FPS test and do not change device settings.
+- Native Android application shell and device overview.
+- Manufacturer, model, Android release, API level, build and supported ABI details.
+- Read-only diagnostics for available/total memory, low-memory state, display refresh-rate modes, battery level, free internal storage and thermal status where exposed by Android.
+- Live Shizuku binder connection detection.
+- User-initiated Shizuku permission request, preceded by an explanation.
+- Graceful standard mode when Shizuku is not installed, stopped or permission is denied.
 
 ## Build
 
-GitHub Actions workflow **Android debug build** runs on pushes affecting the Android project or by manual dispatch. Download the generated debug APK from the workflow run's Artifacts section.
+The **Android debug build** GitHub Actions workflow builds the APK on pushes and pull requests that touch the Android project. It uploads `app-debug.apk` as a workflow artifact.
 
-For a local build with JDK 17 and Gradle 8.9:
+Local build requirements: JDK 17 and Gradle 8.9.
 
 ```sh
 gradle :app:assembleDebug
@@ -34,13 +32,15 @@ gradle :app:assembleDebug
 
 ## Next milestones
 
-1. Add an explicit capability registry for each proposed system action.
-2. Add supported, reversible controls only when public Android APIs or documented Shizuku permissions allow them.
-3. Add a user-controlled export/import bridge for PWA profiles and rules.
-4. Add automated build and compatibility checks before publishing an APK.
+1. Add a native workspace for profiles and FFlags JSON import/export.
+2. Add a capability registry that verifies each Android operation against OS version, service mode and permission state.
+3. Add narrowly scoped, reversible Android controls only where documented APIs support them.
+4. Test on multiple Android versions and OEM devices before a public release.
 
 ## Safety and limitations
 
-This alpha is a device-information and Shizuku-connection foundation, not an FPS booster. It does not change system settings, kill background apps, access protected app data, modify Roblox files, inject code, automate gameplay or bypass platform protections. No specific in-game FPS can be guaranteed. Future privileged actions must be visible, permission-checked, narrowly scoped and reversible where possible.
+This alpha is a device-information and Shizuku-connection foundation, not an FPS booster. It does not kill other apps, clear another app's memory, access protected app data, modify Roblox files, inject code, automate gameplay or bypass platform protections. Diagnostics are not in-game FPS measurements and no FPS increase is guaranteed.
+
+Any future privileged operation must be visible, narrowly scoped, permission-checked, user-confirmed and reversible where possible. Unsupported operations must remain unavailable rather than pretending to work.
 
 Fleasion Mobile is an independent companion project and is not affiliated with Roblox, Shizuku or the original Fleasion project.
