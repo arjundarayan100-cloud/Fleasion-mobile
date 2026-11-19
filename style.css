@@ -215,3 +215,25 @@ body.compact-ui .item,body.compact-ui .toolcard{padding:10px}
 body.reduce-motion *,body.reduce-motion *::before,body.reduce-motion *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 body.light .code-editor{background:#f2f8fa;color:#17313d}
 @media(max-width:560px){.action-grid{grid-template-columns:1fr 1fr}.code-editor{min-height:190px}}
+
+
+/* Fleasion 0.7.1 — compact hamburger navigation */
+[hidden]{display:none!important}
+.top-actions{gap:8px}
+.menu-btn{font-size:21px;line-height:1}
+.tabs{
+  position:fixed;z-index:20;top:calc(70px + 9px);right:max(14px,calc((100vw - 820px)/2));
+  width:min(310px,calc(100vw - 28px));max-height:calc(100dvh - 92px);overflow:auto;
+  display:flex;flex-direction:column;gap:5px;padding:10px;
+  border:1px solid var(--line);border-radius:18px;background:#101927f5;
+  box-shadow:0 20px 60px #0009;backdrop-filter:blur(20px);
+}
+.tab{width:100%;justify-content:flex-start;padding:0 14px;min-height:45px;border-radius:12px}
+.tab.active{box-shadow:inset 3px 0 0 var(--cyan),0 4px 14px #52e3df18}
+body.light .tabs{background:#f9fcfcf5;border-color:#d8e5e9;box-shadow:0 20px 55px #18313a22}
+body.light .tab.active{color:#062226}
+@media(max-width:560px){
+  .topbar{height:62px}
+  .tabs{top:calc(62px + 8px);right:12px;max-height:calc(100dvh - 82px)}
+}
+@media(min-width:650px){.tabs{display:flex;grid-template-columns:none}.tab{justify-content:flex-start}}
