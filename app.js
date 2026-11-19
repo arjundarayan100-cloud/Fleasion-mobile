@@ -116,13 +116,13 @@ function openDialog(dialog) {
 
 $("#menuBtn").addEventListener("click", () => openDialog($("#menuDialog")));
 $("#menuClose").addEventListener("click", () => $("#menuDialog").close());
-$(".tab").forEach((button) => button.addEventListener("click", () => {
-  $(".tab").forEach((tab) => {
+$$(".tab").forEach((button) => button.addEventListener("click", () => {
+  $$(".tab").forEach((tab) => {
     const active = tab === button;
     tab.classList.toggle("active", active);
     tab.setAttribute("aria-selected", String(active));
   });
-  $(".panel").forEach((panel) => panel.classList.toggle("active", panel.id === button.dataset.tab));
+  $$(".panel").forEach((panel) => panel.classList.toggle("active", panel.id === button.dataset.tab));
   if ($("#menuDialog").open) $("#menuDialog").close();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }));
