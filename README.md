@@ -23,3 +23,10 @@ Profiles are stored in this browser's local storage. Use **Export** to keep a po
 
 ## Project
 Fleasion Mobile is an independent community prototype and is not affiliated with Roblox or the original Fleasion project.
+
+
+## Native Android companion (0.6.0 alpha)
+
+A separate native Android project now lives in `app/`. It targets Android 6.0+ and includes device identification plus an optional Shizuku connection and permission-status screen. The existing hosted PWA remains at 0.5.0 while the native companion is developed.
+
+See [ANDROID_COMPANION.md](ANDROID_COMPANION.md) for scope, compatibility, safety limits and build instructions. GitHub Actions can build a debug APK; download it from the workflow run's Artifacts section. The first build still needs to pass before the APK is considered ready to install.
