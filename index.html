@@ -6,17 +6,17 @@
 <meta name="theme-color" content="#080d16">
 <meta name="description" content="Fleasion Mobile — organize profiles and configuration backups.">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="style.css?v=101">
+<link rel="stylesheet" href="style.css?v=106">
 <title>Fleasion Mobile</title>
 </head>
 <body>
 <header class="topbar">
   <a class="brand" href="#" aria-label="Fleasion home"><span class="brand-mark">F<span>.</span></span><span class="brand-copy"><b>FLEASION</b><small>MOBILE WORKSPACE</small></span></a>
-  <div class="top-actions"><span class="version-pill">V0.5.0</span><button type="button" id="themeBtn" class="iconbtn" aria-label="Switch theme" aria-pressed="false">☼</button></div>
+  <div class="top-actions"><span class="version-pill">V0.6.0</span><button type="button" id="themeBtn" class="iconbtn" aria-label="Switch theme" aria-pressed="false">☼</button></div>
 </header>
 <main>
   <section class="hero">
-    <div class="hero-copy"><span class="eyebrow"><i></i> PERSONAL ASSET WORKSPACE</span><h1>Make it <span>yours.</span></h1><p>Keep your profiles, rules and backups organised in one clean space.</p></div>
+    <div class="hero-copy"><span class="eyebrow"><i></i> MOBILE PERFORMANCE WORKSPACE</span><h1>Play <span>smooth.</span></h1><p>Your profiles, device tools and performance guidance in one lightweight companion.</p></div>
     <div class="hero-orbit" aria-hidden="true"><div class="orbit-ring"></div><div class="orbit-core">F<span>.</span></div><i class="orbit-dot"></i></div>
   </section>
   <section class="overview" aria-label="Workspace overview">
@@ -27,9 +27,12 @@
     </div>
   </section>
   <nav class="tabs" aria-label="App sections" role="tablist">
-    <button type="button" class="tab active" role="tab" aria-selected="true" data-tab="profiles"><span>▦</span>Profiles</button>
-    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="rules"><span>⌁</span>Rules</button>
-    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="tools"><span>⚙</span>Tools</button>
+    <button type="button" class="tab active" role="tab" aria-selected="true" data-tab="profiles"><span>⌂</span>Workspace</button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="rules"><span>⌁</span>Replacement rules</button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="device"><span>▣</span>Device Lab</button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="tools"><span>⚡</span>FPS Lab</button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="shizuku"><span>⌘</span>Shizuku</button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="settings"><span>⚙</span>Settings & info</button>
   </nav>
   <section id="profiles" class="panel active">
     <div class="sectionhead"><div><span class="eyebrow">YOUR COLLECTION</span><h2>Profiles</h2><p class="muted">Separate setups, neatly organised.</p></div><button id="newProfile" class="primary">＋ New</button></div>
@@ -58,10 +61,34 @@
     <div class="toolcard danger-card"><div class="tool-icon">↺</div><div class="tool-copy"><b>Reset workspace</b><p>Remove all locally saved profiles.</p></div><button id="resetBtn" class="danger">Reset</button></div>
     <div class="notice roadmap"><b>Built for mobile</b><p>Fleasion Mobile is an independent companion for organising your own configuration data. Desktop-only integrations are not included in this Android build.</p></div>
   </section>
+  <section id="device" class="panel">
+    <div class="sectionhead"><div><span class="eyebrow">ANDROID HARDWARE</span><h2>Device Lab</h2><p class="muted">A read-only snapshot of information your browser exposes.</p></div><button id="refreshDevice" class="secondary">↻ Refresh</button></div>
+    <div class="device-grid">
+      <div class="device-stat"><small>DEVICE PLATFORM</small><b id="devicePlatform">Checking…</b></div>
+      <div class="device-stat"><small>LOGICAL CPU CORES</small><b id="deviceCores">—</b></div>
+      <div class="device-stat"><small>MEMORY HINT</small><b id="deviceMemory">Unavailable</b></div>
+      <div class="device-stat"><small>SCREEN</small><b id="deviceScreen">—</b></div>
+    </div>
+    <div class="toolcard"><div class="tool-icon">◉</div><div class="tool-copy"><b>Performance basics</b><p>Keep at least 10–15% storage free, close apps you are not using, disable downloads during play and let the phone cool between long sessions.</p></div></div>
+    <div class="notice"><b>Hardware information limits</b><p>Android browsers do not expose exact free RAM, CPU temperature, GPU load or total storage to a normal website. Fleasion will not invent those readings or claim to clear system RAM.</p></div>
+  </section>
+  <section id="shizuku" class="panel">
+    <div class="sectionhead"><div><span class="eyebrow">ANDROID SERVICE BRIDGE</span><h2>Shizuku</h2><p class="muted">Permission guide and compatibility status.</p></div><span class="local-chip">COMPANION MODE</span></div>
+    <div class="shizuku-status"><span class="status-orb"></span><div><b>Native connection unavailable</b><small>This web/PWA build cannot bind to the Shizuku service.</small></div></div>
+    <div class="toolcard"><div class="tool-icon">↗</div><div class="tool-copy"><b>Shizuku project</b><p>Read the official setup instructions and start the service using its supported Android method.</p></div><a class="secondary link-button" href="https://shizuku.rikka.app/" target="_blank" rel="noopener">Official guide</a></div>
+    <div class="notice"><b>What comes next</b><p>Direct Shizuku integration requires a native Android companion using the Shizuku API. A website cannot safely grant itself that access. We will only add real, permission-checked actions in a native build—never fake a connected status.</p></div>
+    <div class="shizuku-check"><b>Supported design principles</b><ul><li>Show connection state only when verified.</li><li>Ask before each privileged operation.</li><li>Explain exactly what an operation changes.</li><li>Provide a way to cancel or reverse supported changes.</li></ul></div>
+  </section>
+  <section id="settings" class="panel">
+    <div class="sectionhead"><div><span class="eyebrow">APP PREFERENCES</span><h2>Settings & info</h2><p class="muted">About this build and your local data.</p></div></div>
+    <div class="toolcard"><div class="tool-icon">F.</div><div class="tool-copy"><b>Fleasion Mobile 0.6.0</b><p>Independent Roblox configuration companion. Profiles and rules stay in this browser's local storage.</p></div><span class="local-chip">BETA</span></div>
+    <div class="toolcard"><div class="tool-icon">☾</div><div class="tool-copy"><b>Appearance</b><p>Use the sun/moon button in the top bar to switch themes.</p></div></div>
+    <div class="notice"><b>Safety & compatibility</b><p>Fleasion does not inject code into Roblox, bypass anti-cheat, modify protected game files or promise specific FPS gains. Configuration exports are for organising your own data.</p></div>
+  </section>
   <footer><span class="footer-mark">F.</span><span>Fleasion Mobile · Independent companion</span></footer>
 </main>
 <dialog id="profileDialog"><form method="dialog" id="profileForm"><div class="modalhead"><div><span class="eyebrow">PROFILE SETTINGS</span><h2 id="profileDialogTitle">New profile</h2></div><button class="iconbtn" value="cancel" aria-label="Close">✕</button></div><label>Profile name<input id="profileName" maxlength="60" required placeholder="e.g. My setup"></label><div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveProfile" value="default">Save profile</button></div></form></dialog>
 <dialog id="ruleDialog"><form method="dialog" id="ruleForm"><div class="modalhead"><div><span class="eyebrow">RULE EDITOR</span><h2 id="ruleDialogTitle">Add rule</h2></div><button class="iconbtn" value="cancel" aria-label="Close">✕</button></div><label>Original asset ID<input id="originalId" inputmode="numeric" placeholder="123456789" required></label><label>Replacement target<input id="replacement" placeholder="Asset ID, HTTPS URL, or local path" required></label><label>Notes <span class="optional">(optional)</span><input id="ruleNotes" maxlength="120" placeholder="Add a short note"></label><div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveRule" value="default">Save rule</button></div></form></dialog>
 <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
-<script src="app.js?v=103"></script>
+<script src="app.js?v=106"></script>
 </body></html>
