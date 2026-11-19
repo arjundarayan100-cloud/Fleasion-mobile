@@ -218,7 +218,7 @@ class MainActivity : Activity() {
         if (!::webView.isInitialized) return
         webView.post {
             webView.evaluateJavascript(
-                "if (window.refreshNativeShizuku) window.refreshNativeShizuku();",
+                "if (window.refreshNativeShizuku) window.refreshNativeShizuku(); if (window.refreshNativeDeviceSnapshot) window.refreshNativeDeviceSnapshot();",
                 null
             )
         }
