@@ -15,10 +15,17 @@ import android.os.StatFs
 import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
+import android.webkit.JavascriptInterface
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import android.widget.Toast
 import rikka.shizuku.Shizuku
 import java.util.Locale
 
@@ -26,6 +33,11 @@ class MainActivity : Activity() {
     private lateinit var statusText: TextView
     private lateinit var permissionButton: Button
     private lateinit var diagnosticsContainer: LinearLayout
+    private lateinit var workspaceWebView: WebView
+    private lateinit var workspaceButton: Button
+    private lateinit var deviceButton: Button
+    private var fileChooserCallback: ValueCallback<Array<Uri>>? = null
+    private var pendingJsonExport: String? = null
 
     private val binderReceivedListener = Shizuku.OnBinderReceivedListener { refreshStatus() }
     private val binderDeadListener = Shizuku.OnBinderDeadListener { refreshStatus() }
@@ -61,56 +73,86 @@ class MainActivity : Activity() {
         Shizuku.removeBinderReceivedListener(binderReceivedListener)
         Shizuku.removeBinderDeadListener(binderDeadListener)
         Shizuku.removeRequestPermissionResultListener(permissionResultListener)
+        if (::workspaceWebView.isInitialized) workspaceWebView.destroy()
         super.onDestroy()
     }
 
+    @Suppress("DEPRECATION")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
+        super.onActivityResult(requestCode, resultCode, resultData)
+        if (requestCode == SAVE_JSON_REQUEST) {
+            val uri = resultData?.data
+            val content = pendingJsonExport
+            pendingJsonExport = null
+            if (resultCode == RESULT_OK && uri != null && content != null) {
+                runCatching {
+                    contentResolver.openOutputStream(uri)?.use { it.write(content.toByteArray(Charsets.UTF_8)) }
+                        ?: error("Could not open the selected file")
+                }.onSuccess {
+                    Toast.makeText(this, "Fleasion backup saved", Toast.LENGTH_SHORT).show()
+                }.onFailure {
+                    Toast.makeText(this, "Export failed: ${it.message ?: "unknown error"}", Toast.LENGTH_LONG).show()
+                }
+            }
+        } else if (requestCode == PICK_JSON_REQUEST) {
+            val callback = fileChooserCallback
+            fileChooserCallback = null
+            callback?.onReceiveValue(
+                if (resultCode == RESULT_OK && resultData?.data != null) arrayOf(resultData.data!!) else null
+            )
+        }
+    }
+
     private fun buildScreen() {
-        val page = LinearLayout(this).apply {
+        val diagnosticsPage = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(20), dp(26), dp(20), dp(30))
             setBackgroundColor(0xFF080D16.toInt())
         }
-        val scroll = ScrollView(this).apply { isFillViewport = true; addView(page) }
+        val diagnosticsScroll = ScrollView(this).apply {
+            isFillViewport = true
+            addView(diagnosticsPage)
+        }
 
-        page.addView(text("FLEASION  /  MOBILE", 12f, 0xFF52E3DF.toInt(), true))
-        page.addView(text("Your device.\nYour control.", 31f, 0xFFFFFFFF.toInt(), true).apply {
+        diagnosticsPage.addView(text("FLEASION  /  MOBILE", 12f, 0xFF52E3DF.toInt(), true))
+        diagnosticsPage.addView(text("Your device.\nYour control.", 31f, 0xFFFFFFFF.toInt(), true).apply {
             setPadding(0, dp(10), 0, dp(5))
         })
-        page.addView(text("UNIVERSAL ANDROID COMPANION  ·  0.6.0 ALPHA", 10f, 0xFF91A5B9.toInt(), true)
+        diagnosticsPage.addView(text("UNIVERSAL ANDROID COMPANION  ·  0.7.0 ALPHA", 10f, 0xFF91A5B9.toInt(), true)
             .apply { setPadding(0, 0, 0, dp(18)) })
 
-        page.addView(cardTitle("DEVICE OVERVIEW"))
-        page.addView(infoLine("Manufacturer", Build.MANUFACTURER.orUnknown()))
-        page.addView(infoLine("Model", Build.MODEL.orUnknown()))
-        page.addView(infoLine("Android version", "Android ${Build.VERSION.RELEASE.orUnknown()}"))
-        page.addView(infoLine("API level", Build.VERSION.SDK_INT.toString()))
-        page.addView(infoLine("Build", Build.DISPLAY.orUnknown()))
-        page.addView(infoLine("Supported ABIs", Build.SUPPORTED_ABIS.joinToString().ifBlank { "Unknown" }))
+        diagnosticsPage.addView(cardTitle("DEVICE OVERVIEW"))
+        diagnosticsPage.addView(infoLine("Manufacturer", Build.MANUFACTURER.orUnknown()))
+        diagnosticsPage.addView(infoLine("Model", Build.MODEL.orUnknown()))
+        diagnosticsPage.addView(infoLine("Android version", "Android ${Build.VERSION.RELEASE.orUnknown()}"))
+        diagnosticsPage.addView(infoLine("API level", Build.VERSION.SDK_INT.toString()))
+        diagnosticsPage.addView(infoLine("Build", Build.DISPLAY.orUnknown()))
+        diagnosticsPage.addView(infoLine("Supported ABIs", Build.SUPPORTED_ABIS.joinToString().ifBlank { "Unknown" }))
 
-        page.addView(cardTitle("LIVE DEVICE DIAGNOSTICS"))
-        page.addView(text(
+        diagnosticsPage.addView(cardTitle("LIVE DEVICE DIAGNOSTICS"))
+        diagnosticsPage.addView(text(
             "Read-only information from Android. These values describe device capability and current conditions; they are not Roblox FPS measurements.",
             12f, 0xFF91A5B9.toInt(), false
         ).apply { setPadding(0, 0, 0, dp(8)) })
         diagnosticsContainer = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        page.addView(diagnosticsContainer)
-        page.addView(Button(this).apply {
+        diagnosticsPage.addView(diagnosticsContainer)
+        diagnosticsPage.addView(Button(this).apply {
             text = "Refresh diagnostics"
             isAllCaps = false
             setOnClickListener { refreshDiagnostics() }
         })
 
-        page.addView(cardTitle("SHIZUKU CONNECTION"))
+        diagnosticsPage.addView(cardTitle("SHIZUKU CONNECTION"))
         statusText = text("Checking Shizuku…", 14f, 0xFFE8F4FF.toInt(), false)
         statusText.setPadding(0, dp(7), 0, dp(12))
-        page.addView(statusText)
+        diagnosticsPage.addView(statusText)
         permissionButton = Button(this).apply {
             text = "Request Shizuku permission"
             isAllCaps = false
             setOnClickListener { requestShizukuPermission() }
         }
-        page.addView(permissionButton)
-        page.addView(Button(this).apply {
+        diagnosticsPage.addView(permissionButton)
+        diagnosticsPage.addView(Button(this).apply {
             text = "Shizuku setup guide"
             isAllCaps = false
             setOnClickListener {
@@ -118,16 +160,135 @@ class MainActivity : Activity() {
             }
         })
 
-        page.addView(cardTitle("CAPABILITY-AWARE BY DESIGN"))
-        page.addView(text(
-            "Fleasion checks Android version, hardware and service availability before exposing future controls. Unsupported features stay unavailable instead of pretending to work. Standard features remain usable without Shizuku.",
+        diagnosticsPage.addView(cardTitle("CAPABILITY-AWARE BY DESIGN"))
+        diagnosticsPage.addView(text(
+            "Fleasion checks Android version, hardware and service availability before exposing controls. Unsupported features stay unavailable instead of pretending to work. The full profile and rule workspace is available in the Workspace tab.",
             13f, 0xFFD0DCE8.toInt(), false
         ).apply { setPadding(0, dp(5), 0, dp(8)) })
-        page.addView(text(
-            "Safety: this alpha only reads device information and checks Shizuku status. It does not change system settings, stop other apps, access protected app data, modify Roblox files, inject code or automate gameplay. No FPS increase is promised.",
+        diagnosticsPage.addView(text(
+            "Safety: this build reads device information and checks Shizuku status. It does not change system settings, access protected app data, modify Roblox files, inject code or automate gameplay.",
             11f, 0xFF91A5B9.toInt(), false
         ).apply { setPadding(0, dp(16), 0, 0) })
-        setContentView(scroll)
+
+        workspaceWebView = WebView(this).apply {
+            setBackgroundColor(0xFF080D16.toInt())
+            settings.javaScriptEnabled = true
+            settings.domStorageEnabled = true
+            settings.databaseEnabled = true
+            settings.allowFileAccess = true
+            settings.allowContentAccess = true
+            settings.allowFileAccessFromFileURLs = false
+            settings.allowUniversalAccessFromFileURLs = false
+            settings.mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW
+            settings.setSupportZoom(false)
+            isVerticalScrollBarEnabled = false
+            webViewClient = WebViewClient()
+            webChromeClient = object : WebChromeClient() {
+                override fun onShowFileChooser(
+                    webView: WebView?,
+                    filePathCallback: ValueCallback<Array<Uri>>?,
+                    fileChooserParams: FileChooserParams?
+                ): Boolean {
+                    fileChooserCallback?.onReceiveValue(null)
+                    fileChooserCallback = filePathCallback
+                    val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = "application/json"
+                        putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/json", "text/json", "text/plain"))
+                    }
+                    return try {
+                        startActivityForResult(intent, PICK_JSON_REQUEST)
+                        true
+                    } catch (_: Exception) {
+                        fileChooserCallback?.onReceiveValue(null)
+                        fileChooserCallback = null
+                        false
+                    }
+                }
+            }
+            addJavascriptInterface(WorkspaceBridge(), "FleasionNative")
+            loadUrl("file:///android_asset/workspace/index.html")
+        }
+
+        val content = FrameLayout(this)
+        content.addView(workspaceWebView, FrameLayout.LayoutParams(-1, -1))
+        content.addView(diagnosticsScroll, FrameLayout.LayoutParams(-1, -1))
+        diagnosticsScroll.visibility = View.GONE
+
+        val navigation = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(10), dp(7), dp(10), dp(7))
+            setBackgroundColor(0xFF0C1522.toInt())
+        }
+        workspaceButton = navButton("Workspace", true) { showWorkspace() }
+        deviceButton = navButton("Device + Shizuku", false) { showDevice() }
+        navigation.addView(workspaceButton, LinearLayout.LayoutParams(0, dp(44), 1f).apply {
+            marginEnd = dp(6)
+        })
+        navigation.addView(deviceButton, LinearLayout.LayoutParams(0, dp(44), 1f))
+
+        val root = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(0xFF080D16.toInt())
+            addView(navigation, LinearLayout.LayoutParams(-1, -2))
+            addView(content, LinearLayout.LayoutParams(-1, 0, 1f))
+        }
+        setContentView(root)
+        showWorkspace()
+    }
+
+    private fun navButton(label: String, selected: Boolean, action: () -> Unit) =
+        Button(this).apply {
+            text = label
+            isAllCaps = false
+            textSize = 12f
+            setTextColor(if (selected) 0xFF06151B.toInt() else 0xFFE8F4FF.toInt())
+            setBackgroundColor(if (selected) 0xFF52E3DF.toInt() else 0xFF18283A.toInt())
+            setOnClickListener { action() }
+        }
+
+    private fun showWorkspace() {
+        workspaceWebView.visibility = View.VISIBLE
+        // The diagnostics view is the second child of the content frame.
+        (workspaceWebView.parent as? FrameLayout)?.getChildAt(1)?.visibility = View.GONE
+        workspaceButton.setBackgroundColor(0xFF52E3DF.toInt())
+        workspaceButton.setTextColor(0xFF06151B.toInt())
+        deviceButton.setBackgroundColor(0xFF18283A.toInt())
+        deviceButton.setTextColor(0xFFE8F4FF.toInt())
+    }
+
+    private fun showDevice() {
+        workspaceWebView.visibility = View.GONE
+        (workspaceWebView.parent as? FrameLayout)?.getChildAt(1)?.visibility = View.VISIBLE
+        deviceButton.setBackgroundColor(0xFF52E3DF.toInt())
+        deviceButton.setTextColor(0xFF06151B.toInt())
+        workspaceButton.setBackgroundColor(0xFF18283A.toInt())
+        workspaceButton.setTextColor(0xFFE8F4FF.toInt())
+        refreshStatus()
+        refreshDiagnostics()
+    }
+
+    private inner class WorkspaceBridge {
+        @JavascriptInterface
+        fun saveJson(content: String, filename: String) {
+            runOnUiThread {
+                pendingJsonExport = content
+                val safeName = filename.replace(Regex("[^A-Za-z0-9._-]"), "-").take(80)
+                    .ifBlank { "fleasion-backup.json" }
+                val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "application/json"
+                    putExtra(Intent.EXTRA_TITLE, safeName)
+                }
+                try {
+                    startActivityForResult(intent, SAVE_JSON_REQUEST)
+                } catch (_: Exception) {
+                    pendingJsonExport = null
+                    Toast.makeText(this@MainActivity, "No file picker is available", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 
     private fun refreshDiagnostics() {
@@ -244,5 +405,9 @@ class MainActivity : Activity() {
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
     private fun String?.orUnknown(): String = this?.takeIf { it.isNotBlank() } ?: "Unknown"
 
-    companion object { private const val REQUEST_CODE = 7301 }
+    companion object {
+        private const val REQUEST_CODE = 7301
+        private const val SAVE_JSON_REQUEST = 7302
+        private const val PICK_JSON_REQUEST = 7303
+    }
 }
