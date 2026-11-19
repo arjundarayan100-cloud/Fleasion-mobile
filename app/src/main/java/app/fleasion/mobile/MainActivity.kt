@@ -143,9 +143,9 @@ class MainActivity : Activity() {
             setOnClickListener { refreshDiagnostics() }
         })
 
-        diagnosticsPage.addView(cardTitle("FPS READINESS · SAFE OPTIMIZATION"))
+        diagnosticsPage.addView(cardTitle("PERFORMANCE CONTROLS · 4 GB FRIENDLY"))
         diagnosticsPage.addView(text(
-            "Fleasion checks memory pressure and thermal status, then lets you open Android's own settings. These are device-level steps, not a guaranteed in-game FPS boost.",
+            "Live RAM, memory pressure, display resolution, refresh rate, storage and thermal readings. Use the quick actions below for supported Android settings.",
             12f, 0xFF91A5B9.toInt(), false
         ).apply { setPadding(0, 0, 0, dp(10)) })
         diagnosticsPage.addView(Button(this).apply {
@@ -163,7 +163,7 @@ class MainActivity : Activity() {
             }
         })
         diagnosticsPage.addView(Button(this).apply {
-            text = "Open display settings"
+            text = "Open display / resolution settings"
             isAllCaps = false
             setOnClickListener {
                 runCatching { startActivity(Intent(android.provider.Settings.ACTION_DISPLAY_SETTINGS)) }
@@ -175,7 +175,7 @@ class MainActivity : Activity() {
             11f, 0xFFD0DCE8.toInt(), false
         ).apply { setPadding(0, dp(8), 0, dp(8)) })
 
-        diagnosticsPage.addView(cardTitle("SHIZUKU CONNECTION"))
+        diagnosticsPage.addView(cardTitle("SHIZUKU · SERVICE & PERMISSIONS"))
         statusText = text("Checking Shizuku…", 14f, 0xFFE8F4FF.toInt(), false)
         statusText.setPadding(0, dp(7), 0, dp(12))
         diagnosticsPage.addView(statusText)
@@ -328,6 +328,8 @@ class MainActivity : Activity() {
             json.put("totalRam", formatBytes(memory.totalMem))
             json.put("memoryPressure", memory.lowMemory)
             json.put("refreshRate", String.format(Locale.US, "%.1f Hz", display.refreshRate))
+            val metrics = resources.displayMetrics
+            json.put("resolution", "${metrics.widthPixels} × ${metrics.heightPixels}")
             json.put("thermal", thermal)
             json.put("thermalWarning", thermalStatus >= PowerManager.THERMAL_STATUS_MODERATE)
             json.put("freeStorage", storage?.let { formatBytes(it.availableBytes) } ?: "Unavailable")
@@ -386,6 +388,10 @@ class MainActivity : Activity() {
 
         val display = (getSystemService(WINDOW_SERVICE) as WindowManager).defaultDisplay
         addDiagnostic("Current display rate", String.format(Locale.US, "%.1f Hz", display.refreshRate))
+        val metrics = resources.displayMetrics
+        addDiagnostic("Logical resolution", "${metrics.widthPixels} × ${metrics.heightPixels}")
+        val usedPercent = if (memory.totalMem > 0) (((memory.totalMem - memory.availMem) * 100) / memory.totalMem).coerceIn(0, 100) else -1
+        addDiagnostic("Estimated memory in use", if (usedPercent >= 0) "$usedPercent%" else "Unavailable")
         val modes = runCatching { display.supportedModes.map { it.refreshRate }.distinct().sorted() }
             .getOrDefault(emptyList())
         addDiagnostic("Reported display modes", if (modes.isEmpty()) "Not reported" else
@@ -437,8 +443,8 @@ class MainActivity : Activity() {
         }.getOrDefault(false)
         statusText.text = when {
             !connected -> "Not connected. Start Shizuku, then return here."
-            granted -> "Connected · permission granted"
-            else -> "Connected · permission not granted"
+            granted -> "CONNECTED · permission granted"
+            else -> "CONNECTED · permission not granted"
         }
         permissionButton.isEnabled = connected && !granted
         permissionButton.text = if (granted) "Permission granted" else "Request Shizuku permission"
