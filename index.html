@@ -6,15 +6,27 @@
 <meta name="theme-color" content="#080d16">
 <meta name="description" content="Fleasion Mobile — organize profiles and configuration backups.">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="style.css?v=101">
+<link rel="stylesheet" href="style.css?v=103">
 <title>Fleasion Mobile</title>
 </head>
 <body>
 <header class="topbar">
   <a class="brand" href="#" aria-label="Fleasion home"><span class="brand-mark">F<span>.</span></span><span class="brand-copy"><b>FLEASION</b><small>MOBILE WORKSPACE</small></span></a>
-  <div class="top-actions"><span class="version-pill">V0.5.0</span><button type="button" id="themeBtn" class="iconbtn" aria-label="Switch theme" aria-pressed="false">☼</button></div>
+  <div class="top-actions"><button type="button" id="menuBtn" class="iconbtn menu-trigger" aria-label="Open navigation menu" aria-haspopup="dialog">☰</button><span class="version-pill">V0.7.0</span><button type="button" id="themeBtn" class="iconbtn" aria-label="Switch theme" aria-pressed="false">☼</button></div>
 </header>
+<dialog id="menuDialog" class="menu-dialog" aria-label="Main navigation">
+  <div class="menu-head"><div><span class="eyebrow">FLEASION MENU</span><h2>Workspace</h2></div><button type="button" id="menuClose" class="iconbtn" aria-label="Close menu">✕</button></div>
+  <nav class="menu-nav" aria-label="Workspace sections">
+    <button type="button" class="tab active" role="tab" aria-selected="true" data-tab="dashboard"><span>⌂</span><span><b>Dashboard</b><small>Performance overview</small></span></button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="profiles"><span>▦</span><span><b>Profiles</b><small>Saved setups and backups</small></span></button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="rules"><span>⌁</span><span><b>Replacer</b><small>Replacement rules</small></span></button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="flags"><span>⚑</span><span><b>FastFlags</b><small>PC profile tools</small></span></button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="tools"><span>⚙</span><span><b>Tools & settings</b><small>Utilities and storage</small></span></button>
+  </nav>
+  <p class="menu-foot">Your profiles stay on this device.</p>
+</dialog>
 <main>
+  <section id="dashboard" class="panel active dashboard-panel">
   <section class="hero">
     <div class="hero-copy"><span class="eyebrow"><i></i> PERSONAL ASSET WORKSPACE</span><h1>Make it <span>yours.</span></h1><p>Keep your profiles, rules and backups organised in one clean space.</p></div>
     <div class="hero-orbit" aria-hidden="true"><div class="orbit-ring"></div><div class="orbit-core">F<span>.</span></div><i class="orbit-dot"></i></div>
@@ -26,12 +38,24 @@
       <div class="stat-card"><span class="stat-symbol">⌁</span><div><b id="ruleStat">—</b><small>ACTIVE RULES</small></div></div>
     </div>
   </section>
-  <nav class="tabs" aria-label="App sections" role="tablist">
-    <button type="button" class="tab active" role="tab" aria-selected="true" data-tab="profiles"><span>▦</span>Profiles</button>
-    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="rules"><span>⌁</span>Rules</button>
-    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="tools"><span>⚙</span>Tools</button>
-  </nav>
-  <section id="profiles" class="panel active">
+  <section class="fps-panel fps-command">
+    <div class="fps-panel-head"><div><span class="eyebrow"><i></i> PERFORMANCE CENTER</span><h2>FPS Lab</h2><p>Check device readiness and get a sensible setup for smoother gameplay.</p></div><span class="fps-chip">LAB</span></div>
+    <div class="fps-metrics">
+      <div class="fps-metric"><small>BROWSER TEST</small><b id="fpsResult">—</b><span id="fpsResultLabel">Ready when you are</span></div>
+      <div class="fps-metric"><small>OPTIMIZATION MODE</small><b id="fpsModeLabel">Balanced</b><span>Recommendation profile</span></div>
+    </div>
+    <button type="button" id="fpsTestBtn" class="primary fps-test">Run 5-second smoothness test</button>
+    <div class="fps-profile-row"><label for="fpsProfile">Choose a performance guide</label><select id="fpsProfile"><option value="low">Low-end device</option><option value="balanced" selected>Balanced</option><option value="performance">Performance priority</option></select></div>
+    <div class="fps-guide-grid">
+      <article class="fps-guide-card"><span>01 · GRAPHICS</span><b>In-game quality</b><p>Start with lower Roblox graphics on demanding experiences, then raise it only if frame pacing stays smooth.</p></article>
+      <article class="fps-guide-card"><span>02 · THERMALS</span><b>Keep it cool</b><p>Heat can reduce performance. Take a break if the device becomes unusually hot.</p></article>
+      <article class="fps-guide-card"><span>03 · MEMORY</span><b>Free up headroom</b><p>Close apps you are finished using and keep some internal storage available.</p></article>
+    </div>
+    <p id="fpsTips" class="fps-tips">Use Roblox's in-game graphics controls and keep the phone cool for steadier performance.</p>
+    <div class="fps-disclaimer"><b>What this test means</b><p>The 5-second test measures this app's browser animation only — it is not Roblox FPS. Real game readings and supported device information belong in Device + Shizuku. Fleasion does not promise a fixed FPS or change protected Roblox files.</p></div>
+  </section>
+  </section>
+  <section id="profiles" class="panel">
     <div class="sectionhead"><div><span class="eyebrow">YOUR COLLECTION</span><h2>Profiles</h2><p class="muted">Separate setups, neatly organised.</p></div><button id="newProfile" class="primary">＋ New</button></div>
     <div id="profileList" class="stack"></div>
     <div class="backup-card"><div class="backup-icon">↕</div><div class="backup-copy"><b>Backup & transfer</b><span>Move profiles or keep a safe copy.</span></div><div class="actions"><button id="importConfig" class="secondary">Import</button><button id="exportConfig" class="secondary">Export</button><input id="fileInput" type="file" accept=".json,application/json" hidden></div></div>
@@ -43,17 +67,25 @@
     <div id="ruleList" class="stack"></div>
     <div class="notice"><b>Companion mode</b><p>Fleasion organises and exports configuration data. It does not apply changes inside the Roblox Android app.</p></div>
   </section>
+  <section id="flags" class="panel">
+    <div class="sectionhead"><div><span class="eyebrow">PC PROFILE COMPANION</span><h2>FastFlag profiles</h2><p class="muted">Import and organise compatible PC profile JSON.</p></div></div>
+    <div class="ff-toolbar">
+      <label class="ff-profile-label" for="ffProfileSelect">Current profile</label>
+      <select id="ffProfileSelect" aria-label="Select FastFlag profile"></select>
+      <button id="ffNewProfile" class="secondary" type="button">＋ New</button>
+      <button id="ffDeleteProfile" class="danger" type="button">Delete</button>
+    </div>
+    <div class="ff-editor-card">
+      <div class="ff-editor-head"><div><b id="ffProfileName">Default FastFlag profile</b><small id="ffFlagCount">0 entries</small></div><span class="local-chip">LOCAL ONLY</span></div>
+      <textarea id="ffEditor" rows="12" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder='{"FlagName": true}' aria-label="FastFlag JSON editor"></textarea>
+      <div class="actions ff-actions"><button id="ffValidate" class="secondary" type="button">Validate</button><button id="ffSave" class="primary" type="button">Save profile</button></div>
+    </div>
+    <div class="backup-card"><div class="backup-icon">↕</div><div class="backup-copy"><b>PC profile transfer</b><span>Import or export JSON profile files.</span></div><div class="actions"><button id="ffImport" class="secondary" type="button">Import PC</button><button id="ffExport" class="secondary" type="button">Export</button><input id="ffFileInput" type="file" accept=".json,application/json" hidden></div></div>
+    <div id="ffCompatibility" class="notice"><b>Compatibility check</b><p>Fleasion can validate JSON structure and value types. It cannot confirm that every community flag is currently supported by Roblox or apply flags to the Roblox app. Unsupported, deprecated or unknown flags must be checked against current official Roblox guidance.</p></div>
+  </section>
   <section id="tools" class="panel">
     <div class="sectionhead"><div><span class="eyebrow">WORKSPACE UTILITIES</span><h2>Tools</h2><p class="muted">Quick checks and device storage.</p></div></div>
     <div class="toolcard"><div class="tool-icon">✓</div><div class="tool-copy"><b>JSON validator</b><p>Check a config file before importing.</p></div><button id="validateBtn" class="secondary">Choose file</button><input id="validateInput" type="file" accept=".json,application/json" hidden></div>
-    <div class="fps-panel">
-      <div class="fps-panel-head"><div><span class="eyebrow">DEVICE CHECK</span><h3>FPS quick check</h3><p>Measures this app's browser animation smoothness, not Roblox's in-game FPS.</p></div><span class="fps-chip">5 SEC</span></div>
-      <div class="fps-result"><b id="fpsResult">—</b><span id="fpsResultLabel">Ready to test</span></div>
-      <button type="button" id="fpsTestBtn" class="primary fps-test">Run 5-second test</button>
-      <div class="fps-profile-row"><label for="fpsProfile">Performance guide</label><select id="fpsProfile"><option value="low">Low-end device</option><option value="balanced" selected>Balanced</option><option value="performance">Performance priority</option></select></div>
-      <p id="fpsTips" class="fps-tips">Use Roblox's in-game graphics controls and keep the phone cool for steadier performance.</p>
-      <p class="fps-disclaimer">This tool does not change Roblox settings, install FFlags, or guarantee 30–50 FPS. Results depend on the phone, game, temperature and network.</p>
-    </div>
     <div class="toolcard"><div class="tool-icon">▣</div><div class="tool-copy"><b>Local storage</b><p id="storageInfo">Your profiles are stored on this device.</p></div><span class="local-chip">ON DEVICE</span></div>
     <div class="toolcard danger-card"><div class="tool-icon">↺</div><div class="tool-copy"><b>Reset workspace</b><p>Remove all locally saved profiles.</p></div><button id="resetBtn" class="danger">Reset</button></div>
     <div class="notice roadmap"><b>Built for mobile</b><p>Fleasion Mobile is an independent companion for organising your own configuration data. Desktop-only integrations are not included in this Android build.</p></div>
@@ -63,5 +95,5 @@
 <dialog id="profileDialog"><form method="dialog" id="profileForm"><div class="modalhead"><div><span class="eyebrow">PROFILE SETTINGS</span><h2 id="profileDialogTitle">New profile</h2></div><button class="iconbtn" value="cancel" aria-label="Close">✕</button></div><label>Profile name<input id="profileName" maxlength="60" required placeholder="e.g. My setup"></label><div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveProfile" value="default">Save profile</button></div></form></dialog>
 <dialog id="ruleDialog"><form method="dialog" id="ruleForm"><div class="modalhead"><div><span class="eyebrow">RULE EDITOR</span><h2 id="ruleDialogTitle">Add rule</h2></div><button class="iconbtn" value="cancel" aria-label="Close">✕</button></div><label>Original asset ID<input id="originalId" inputmode="numeric" placeholder="123456789" required></label><label>Replacement target<input id="replacement" placeholder="Asset ID, HTTPS URL, or local path" required></label><label>Notes <span class="optional">(optional)</span><input id="ruleNotes" maxlength="120" placeholder="Add a short note"></label><div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveRule" value="default">Save rule</button></div></form></dialog>
 <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
-<script src="app.js?v=103"></script>
+<script src="app.js?v=105"></script>
 </body></html>
