@@ -157,8 +157,7 @@ $("#profileForm").addEventListener("submit", (event) => {
   } else if (data.profiles[editingProfile]) {
     data.profiles[editingProfile].name = name;
   }
-  $("#profileDialog").close();
-  if (save()) toast("Profile saved");
+  $("#profileDialog").close();  if (save()) toast("Profile saved");
 });
 
 $("#newRule").addEventListener("click", () => {
@@ -317,8 +316,7 @@ $("#fileInput").addEventListener("change", async (event) => {
 $("#validateBtn").addEventListener("click", () => $("#validateInput").click());
 $("#validateInput").addEventListener("change", async (event) => {
   const file = event.target.files && event.target.files[0];
-  if (!file) return;
-  try {
+  if (!file) return;  try {
     if (file.size > 2 * 1024 * 1024) throw new Error("Choose a JSON file smaller than 2 MB.");
     JSON.parse(await file.text());
     toast("Valid JSON ✓");
@@ -348,6 +346,127 @@ $("#themeBtn").addEventListener("click", () => {
   applyTheme();
   try { localStorage.setItem(THEME_KEY, isLight ? "light" : "dark"); } catch { /* Keep the theme for this session. */ }
   toast((isLight ? "Light" : "Dark") + " theme");
+});
+
+
+const FF_KEY = "fleasion-mobile-fastflags-v1";
+const FF_DEFAULT = { name: "Default FastFlag profile", flags: {} };
+function normalizeFastFlags(source) {
+  if (!source || typeof source !== "object" || Array.isArray(source)) throw new Error("FastFlag profile must be a JSON object.");
+  let flags = source.flags ?? source.FastFlags ?? source.fastFlags ?? source;
+  if (!flags || typeof flags !== "object" || Array.isArray(flags)) throw new Error("Could not find a FastFlag key/value object.");
+  const clean = {};
+  for (const [key, value] of Object.entries(flags)) {
+    if (["name", "profile", "version", "description", "metadata"].includes(key)) continue;
+    if (!/^[A-Za-z][A-Za-z0-9_]{1,127}$/.test(key)) throw new Error("Invalid flag name: " + key);
+    if (!(typeof value === "boolean" || typeof value === "string" || (typeof value === "number" && Number.isFinite(value)))) {
+      throw new Error("Flag values must be strings, numbers or booleans (" + key + ").");
+    }
+    if (typeof value === "string" && value.length > 1000) throw new Error("A flag value is too long (" + key + ").");
+    clean[key] = value;
+    if (Object.keys(clean).length > 1000) throw new Error("A profile can contain at most 1,000 entries.");
+  }
+  return clean;
+}
+function readFastFlagState() {
+  try {
+    const saved = JSON.parse(readLocal(FF_KEY) || "null");
+    if (saved && Array.isArray(saved.profiles) && saved.profiles.length) {
+      return {
+        active: Number.isInteger(saved.active) && saved.profiles[saved.active] ? saved.active : 0,
+        profiles: saved.profiles.map((p, i) => ({
+          name: String(p.name || ("FastFlag profile " + (i + 1))).slice(0, 60),
+          flags: normalizeFastFlags(p.flags || {})
+        }))
+      };
+    }
+  } catch (error) { startupWarning = "A saved FastFlag profile could not be read: " + error.message; }
+  return { active: 0, profiles: [{ ...FF_DEFAULT }] };
+}
+let ffState = readFastFlagState();
+function activeFF() { return ffState.profiles[ffState.active] || ffState.profiles[0]; }
+function saveFFState() {
+  try { localStorage.setItem(FF_KEY, JSON.stringify(ffState)); }
+  catch { toast("FastFlag changes could not be saved in local storage."); return false; }
+  renderFF();
+  return true;
+}
+function renderFF() {
+  const select = $("#ffProfileSelect");
+  if (!select) return;
+  select.innerHTML = ffState.profiles.map((p, i) => "<option value='" + i + "'>" + escapeHtml(p.name) + "</option>").join("");
+  select.value = String(ffState.active);
+  const profile = activeFF();
+  $("#ffProfileName").textContent = profile.name;
+  $("#ffFlagCount").textContent = Object.keys(profile.flags).length + " entries";
+  $("#ffEditor").value = JSON.stringify(profile.flags, null, 2);
+  $("#ffDeleteProfile").disabled = ffState.profiles.length <= 1;
+}
+function parseFFEditor() {
+  let parsed;
+  try { parsed = JSON.parse($("#ffEditor").value); }
+  catch (error) { throw new Error("Invalid JSON: " + error.message); }
+  return normalizeFastFlags(parsed);
+}
+$("#ffProfileSelect").addEventListener("change", () => {
+  ffState.active = Number($("#ffProfileSelect").value);
+  renderFF();
+  saveFFState();
+});
+$("#ffNewProfile").addEventListener("click", () => {
+  const name = prompt("Name this FastFlag profile:");
+  if (!name || !name.trim()) return;
+  ffState.profiles.push({ name: name.trim().slice(0, 60), flags: {} });
+  ffState.active = ffState.profiles.length - 1;
+  saveFFState();
+  toast("FastFlag profile created");
+});
+$("#ffDeleteProfile").addEventListener("click", () => {
+  if (ffState.profiles.length <= 1) return;
+  if (!confirm("Delete the selected FastFlag profile?")) return;
+  ffState.profiles.splice(ffState.active, 1);
+  ffState.active = Math.max(0, ffState.active - 1);
+  saveFFState();
+  toast("FastFlag profile deleted");
+});
+$("#ffValidate").addEventListener("click", () => {
+  try {
+    const flags = parseFFEditor();
+    toast("Valid JSON · " + Object.keys(flags).length + " flag entries");
+  } catch (error) { toast(error.message); }
+});
+$("#ffSave").addEventListener("click", () => {
+  try {
+    activeFF().flags = parseFFEditor();
+    if (saveFFState()) toast("FastFlag profile saved");
+  } catch (error) { toast(error.message); }
+});
+$("#ffImport").addEventListener("click", () => $("#ffFileInput").click());
+$("#ffFileInput").addEventListener("change", async (event) => {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  try {
+    if (file.size > 1024 * 1024) throw new Error("Choose a JSON file smaller than 1 MB.");
+    const source = JSON.parse(await file.text());
+    const flags = normalizeFastFlags(source);
+    const rawName = source.profile ?? source.name ?? file.name.replace(/\.json$/i, "");
+    ffState.profiles.push({ name: String(rawName || "Imported PC profile").slice(0, 60), flags });
+    ffState.active = ffState.profiles.length - 1;
+    if (saveFFState()) toast("PC FastFlag profile imported · " + Object.keys(flags).length + " entries");
+  } catch (error) { toast("FastFlag import failed: " + error.message); }
+  finally { event.target.value = ""; }
+});
+$("#ffExport").addEventListener("click", () => {
+  try {
+    const flags = parseFFEditor();
+    const profile = activeFF();
+    const payload = { ...flags };
+    const filename = profile.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "fastflag-profile";
+    if (window.FleasionNative && typeof window.FleasionNative.saveJson === "function") {
+      window.FleasionNative.saveJson(JSON.stringify(payload, null, 2), filename + ".json");
+    } else { downloadJson(payload, filename + ".json"); }
+    toast("PC-compatible FastFlag JSON prepared");
+  } catch (error) { toast(error.message); }
 });
 
 const fpsGuides = {
