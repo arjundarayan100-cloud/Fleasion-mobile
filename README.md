@@ -1,27 +1,30 @@
-# Fleasion Mobile Companion — v0.5.0
+# Fleasion Mobile — 0.7.0 alpha02
 
-A phone-first Progressive Web App for organizing local profiles and replacement-rule notes, with JSON import/export and a safe device performance helper. This is an independent companion prototype, not an official Fleasion or Roblox app.
+Fleasion Mobile restores the full phone-first workspace inside the native Android app while keeping the web/PWA version available.
 
-## What's in the v0.5.0 web companion
-- FPS quick check that estimates this app's browser animation rate over five seconds.
-- Low-end, Balanced and Performance-priority guidance for Android devices.
-- Profile and replacement-rule management, enable/disable, search, import/export, validation, theme and local storage.
+## Workspace restored in the Android app
+- Multiple profiles: create, select and rename.
+- Replacement-rule editor: add, edit, enable/disable, delete with confirmation.
+- Rule search and profile/rule counters.
+- JSON import, export and validation.
+- Separate FastFlag profile manager: import PC JSON profiles, edit, validate, switch, save and export compatible key/value JSON.
+- FastFlag structural validation for names and scalar values, with explicit unknown-support warnings; profiles are stored locally and are not applied to Roblox.
+- Local profile storage, dark/light themes and offline bundled workspace.
+- FPS quick check for the Fleasion browser animation only, plus low-end, balanced and performance guidance.
+- Device diagnostics and optional Shizuku connection in a separate native tab.
 
-## Native Android companion (0.6.0 alpha)
+The native APK bundles the same workspace source as the hosted PWA, so core profile/rule tools do not depend on a network connection. JSON import uses Android's document picker and export uses Android's save-file picker.
 
-A native Android companion is being developed alongside the PWA. It includes device identification, read-only device diagnostics and optional Shizuku connection/permission handling.
-
+## Android compatibility
 - Native minimum: Android 7.0 (API 24).
 - Target SDK: 35.
 - Shizuku API: 13.1.5.
-- Older Android devices can continue using the hosted PWA in a supported browser.
-- Features are gated by runtime OS, hardware and service checks.
+- Runtime capability checks and feature-specific fallbacks are required. The hosted PWA remains available on older Android versions that cannot install this native build.
 
-See [ANDROID_COMPANION.md](ANDROID_COMPANION.md) and [ANDROID_CAPABILITY_MATRIX.md](ANDROID_CAPABILITY_MATRIX.md) for details.
+See [ANDROID_COMPANION.md](ANDROID_COMPANION.md) and [ANDROID_CAPABILITY_MATRIX.md](ANDROID_CAPABILITY_MATRIX.md).
 
-## Build and install
-
-The **Android debug build** GitHub Actions workflow builds a debug APK. Download it from the workflow run's Artifacts section. A successful workflow run is required before treating the APK as install-ready.
+## Build
+GitHub Actions **Android debug build** builds the debug APK on Android-project changes. Download it from the workflow run's Artifacts section.
 
 For a local build with JDK 17 and Gradle 8.9:
 
@@ -29,12 +32,9 @@ For a local build with JDK 17 and Gradle 8.9:
 gradle :app:assembleDebug
 ```
 
-## Performance helper limitations
+## Important limitations
+FastFlag profiles are a local profile editor/import-export feature only. The app does not apply flags to Roblox, and a valid JSON profile does not prove a flag is supported or active. The FPS quick check measures browser animation callbacks in Fleasion only; it does not read Roblox's in-game FPS. This companion does not modify Roblox protected files, inject code, automate gameplay or bypass platform protections. Shizuku does not automatically grant root. No FPS increase or target is guaranteed.
 
-The web quick check measures animation callbacks in the Fleasion webpage only. It cannot read Roblox's internal frame rate or improve a Roblox game by itself. It does not install unofficial FFlags, modify Roblox files, inject code, automate gameplay or bypass platform protections. No FPS target is guaranteed.
+PC-only capabilities such as live process interception, desktop cache access, and direct game runtime integrations cannot simply be copied to Android. Android equivalents must be separately designed, permission-checked and tested.
 
-## Data and compatibility
-
-Profiles are stored in the browser's local storage. Use Export to keep a portable JSON copy and Import to add a profile on another device. The export format is a companion format and is not guaranteed to match every Fleasion release or configuration schema.
-
-Fleasion Mobile is an independent community prototype and is not affiliated with Roblox, Shizuku or the original Fleasion project.
+Fleasion Mobile is an independent companion project and is not affiliated with Roblox, Shizuku or the original Fleasion project.
