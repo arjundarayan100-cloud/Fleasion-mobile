@@ -9,8 +9,8 @@ android {
         applicationId = "app.fleasion.mobile"
         minSdk = 24
         targetSdk = 35
-        versionCode = 700
-        versionName = "0.7.0-alpha01"
+        versionCode = 701
+        versionName = "0.7.0-alpha02"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
