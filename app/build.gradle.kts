@@ -7,7 +7,7 @@ android {
     compileSdk = 35
     defaultConfig {
         applicationId = "app.fleasion.mobile"
-        minSdk = 23
+        minSdk = 24
         targetSdk = 35
         versionCode = 600
         versionName = "0.6.0-alpha01"
