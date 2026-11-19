@@ -309,6 +309,50 @@ class MainActivity : Activity() {
 
     private inner class WorkspaceBridge {
         @JavascriptInterface
+        fun getDeviceSnapshot(): String {
+            val activityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
+            val memory = ActivityManager.MemoryInfo()
+            activityManager.getMemoryInfo(memory)
+            val display = (getSystemService(WINDOW_SERVICE) as WindowManager).defaultDisplay
+            val batteryIntent = registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+            val level = batteryIntent?.getIntExtra("level", -1) ?: -1
+            val scale = batteryIntent?.getIntExtra("scale", -1) ?: -1
+            val storage = runCatching { StatFs(Environment.getDataDirectory().absolutePath) }.getOrNull()
+            val thermalStatus = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val power = getSystemService(POWER_SERVICE) as PowerManager
+                runCatching { power.currentThermalStatus }.getOrDefault(-1)
+            } else -1
+            val thermal = if (thermalStatus >= 0) thermalLabel(thermalStatus) else "Not exposed"
+            val json = org.json.JSONObject()
+            json.put("availableRam", formatBytes(memory.availMem))
+            json.put("totalRam", formatBytes(memory.totalMem))
+            json.put("memoryPressure", memory.lowMemory)
+            json.put("refreshRate", String.format(Locale.US, "%.1f Hz", display.refreshRate))
+            json.put("thermal", thermal)
+            json.put("thermalWarning", thermalStatus >= PowerManager.THERMAL_STATUS_MODERATE)
+            json.put("freeStorage", storage?.let { formatBytes(it.availableBytes) } ?: "Unavailable")
+            json.put("battery", if (level >= 0 && scale > 0) "${(level * 100) / scale}%" else "Unavailable")
+            return json.toString()
+        }
+
+        @JavascriptInterface
+        fun openRobloxSettings() {
+            runOnUiThread {
+                runCatching {
+                    startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:com.roblox.client")))
+                }.onFailure { Toast.makeText(this@MainActivity, "Roblox app settings unavailable", Toast.LENGTH_SHORT).show() }
+            }
+        }
+
+        @JavascriptInterface
+        fun openDisplaySettings() {
+            runOnUiThread {
+                runCatching { startActivity(Intent(Settings.ACTION_DISPLAY_SETTINGS)) }
+                    .onFailure { Toast.makeText(this@MainActivity, "Display settings unavailable", Toast.LENGTH_SHORT).show() }
+            }
+        }
+
+        @JavascriptInterface
         fun saveJson(content: String, filename: String) {
             runOnUiThread {
                 pendingJsonExport = content
