@@ -443,11 +443,6 @@ document.addEventListener("visibilitychange", () => {
 
 render();
 if (startupWarning) toast(startupWarning);
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {
-    toast("Offline update could not be registered. The app still works online.");
-  }));
-}
 
 // Fleasion 0.6.0 device snapshot. Browser-exposed values only; no privileged claims.
 function refreshDeviceSnapshot() {
