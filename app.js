@@ -496,10 +496,12 @@ function runSmartTuneup() {
     $("#deviceThermal").textContent = snapshot.thermal || "Unavailable";
     $("#deviceThermalHint").textContent = snapshot.thermalWarning ? "Let the device cool before gaming" : "No elevated thermal warning reported";
     $("#deviceRefresh").textContent = snapshot.refreshRate || "Unavailable";
+    $("#deviceResolution").textContent = snapshot.resolution || "Resolution unavailable";
   } else {
     $("#deviceRam").textContent = "Native app only";
     $("#deviceThermal").textContent = "Native app only";
     $("#deviceRefresh").textContent = "Native app only";
+    $("#deviceResolution").textContent = "Open in Android app";
     $("#deviceRamHint").textContent = "Open Device + Shizuku tab";
   }
   const items = tuneupItems.map(([title, detail]) => "<div class='tuneup-row'><span>✓</span><div><b>" + title + "</b><small>" + detail + "</small></div></div>").join("");
@@ -510,6 +512,7 @@ function runSmartTuneup() {
 }
 $("#optimizeBtn").addEventListener("click", runSmartTuneup);
 $("#refreshDeviceStats").addEventListener("click", runSmartTuneup);
+$("#memoryCheckBtn").addEventListener("click", () => { runSmartTuneup(); $("#memoryActionStatus").textContent = "RAM checked · Android manages background memory automatically"; toast("Memory checked. No apps were force-stopped."); });
 $("#openRobloxSettings").addEventListener("click", () => {
   if (window.FleasionNative && window.FleasionNative.openRobloxSettings) window.FleasionNative.openRobloxSettings();
   else toast("Open Device + Shizuku for Android app settings");
@@ -520,9 +523,9 @@ $("#openDisplaySettings").addEventListener("click", () => {
 });
 
 const fpsGuides = {
-  low: "4 GB mode: use Roblox Manual graphics at a low level, close apps you are finished using, keep storage free and avoid heat.",
+  low: "4 GB mode: set Roblox Graphics Mode to Manual and minimum first, close apps you are finished using, keep storage free and avoid heat.",
   balanced: "Balanced: start with medium in-game graphics, close heavy background apps, use a stable connection, and lower graphics if frame pacing becomes uneven.",
-  performance: "Performance priority: use the lowest graphics level that still looks clear, close background downloads, keep the phone ventilated, and avoid battery-saving modes that throttle performance."
+  performance: "Performance priority: use the lowest comfortable Roblox graphics level, pause downloads, keep the phone ventilated, and use only supported display refresh options."
 };
 applyTheme();
 function updateFpsGuide() {
