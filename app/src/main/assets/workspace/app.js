@@ -114,13 +114,17 @@ function openDialog(dialog) {
   else dialog.setAttribute("open", "");
 }
 
-$$(".tab").forEach((button) => button.addEventListener("click", () => {
-  $$(".tab").forEach((tab) => {
+$("#menuBtn").addEventListener("click", () => openDialog($("#menuDialog")));
+$("#menuClose").addEventListener("click", () => $("#menuDialog").close());
+$(".tab").forEach((button) => button.addEventListener("click", () => {
+  $(".tab").forEach((tab) => {
     const active = tab === button;
     tab.classList.toggle("active", active);
     tab.setAttribute("aria-selected", String(active));
   });
-  $$(".panel").forEach((panel) => panel.classList.toggle("active", panel.id === button.dataset.tab));
+  $(".panel").forEach((panel) => panel.classList.toggle("active", panel.id === button.dataset.tab));
+  if ($("#menuDialog").open) $("#menuDialog").close();
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }));
 
 $("#newProfile").addEventListener("click", () => {
@@ -475,10 +479,13 @@ const fpsGuides = {
   performance: "Performance priority: use the lowest graphics level that still looks clear, close background downloads, keep the phone ventilated, and avoid battery-saving modes that throttle performance."
 };
 applyTheme();
-$("#fpsTips").textContent = fpsGuides[$("#fpsProfile").value];
-$("#fpsProfile").addEventListener("change", () => {
-  $("#fpsTips").textContent = fpsGuides[$("#fpsProfile").value] || fpsGuides.balanced;
-});
+function updateFpsGuide() {
+  const mode = $("#fpsProfile").value;
+  $("#fpsTips").textContent = fpsGuides[mode] || fpsGuides.balanced;
+  $("#fpsModeLabel").textContent = mode === "low" ? "Low-end" : mode === "performance" ? "Performance" : "Balanced";
+}
+updateFpsGuide();
+$("#fpsProfile").addEventListener("change", updateFpsGuide);
 let fpsTestRunning = false;
 let fpsAnimationId = 0;
 $("#fpsTestBtn").addEventListener("click", () => {
