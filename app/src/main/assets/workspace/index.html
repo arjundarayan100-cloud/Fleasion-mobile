@@ -6,13 +6,13 @@
 <meta name="theme-color" content="#080d16">
 <meta name="description" content="Fleasion Mobile — organize profiles and configuration backups.">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="style.css?v=101">
+<link rel="stylesheet" href="style.css?v=102">
 <title>Fleasion Mobile</title>
 </head>
 <body>
 <header class="topbar">
   <a class="brand" href="#" aria-label="Fleasion home"><span class="brand-mark">F<span>.</span></span><span class="brand-copy"><b>FLEASION</b><small>MOBILE WORKSPACE</small></span></a>
-  <div class="top-actions"><span class="version-pill">V0.5.0</span><button type="button" id="themeBtn" class="iconbtn" aria-label="Switch theme" aria-pressed="false">☼</button></div>
+  <div class="top-actions"><span class="version-pill">V0.7.0</span><button type="button" id="themeBtn" class="iconbtn" aria-label="Switch theme" aria-pressed="false">☼</button></div>
 </header>
 <main>
   <section class="hero">
@@ -29,6 +29,7 @@
   <nav class="tabs" aria-label="App sections" role="tablist">
     <button type="button" class="tab active" role="tab" aria-selected="true" data-tab="profiles"><span>▦</span>Profiles</button>
     <button type="button" class="tab" role="tab" aria-selected="false" data-tab="rules"><span>⌁</span>Rules</button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="flags"><span>⚑</span>FastFlags</button>
     <button type="button" class="tab" role="tab" aria-selected="false" data-tab="tools"><span>⚙</span>Tools</button>
   </nav>
   <section id="profiles" class="panel active">
@@ -42,6 +43,22 @@
     <div class="rule-summary"><span id="ruleCount" class="muted"></span><span class="summary-dot"></span><span class="muted">Selected profile</span></div>
     <div id="ruleList" class="stack"></div>
     <div class="notice"><b>Companion mode</b><p>Fleasion organises and exports configuration data. It does not apply changes inside the Roblox Android app.</p></div>
+  </section>
+  <section id="flags" class="panel">
+    <div class="sectionhead"><div><span class="eyebrow">PC PROFILE COMPANION</span><h2>FastFlag profiles</h2><p class="muted">Import and organise compatible PC profile JSON.</p></div></div>
+    <div class="ff-toolbar">
+      <label class="ff-profile-label" for="ffProfileSelect">Current profile</label>
+      <select id="ffProfileSelect" aria-label="Select FastFlag profile"></select>
+      <button id="ffNewProfile" class="secondary" type="button">＋ New</button>
+      <button id="ffDeleteProfile" class="danger" type="button">Delete</button>
+    </div>
+    <div class="ff-editor-card">
+      <div class="ff-editor-head"><div><b id="ffProfileName">Default FastFlag profile</b><small id="ffFlagCount">0 entries</small></div><span class="local-chip">LOCAL ONLY</span></div>
+      <textarea id="ffEditor" rows="12" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder='{"FlagName": true}' aria-label="FastFlag JSON editor"></textarea>
+      <div class="actions ff-actions"><button id="ffValidate" class="secondary" type="button">Validate</button><button id="ffSave" class="primary" type="button">Save profile</button></div>
+    </div>
+    <div class="backup-card"><div class="backup-icon">↕</div><div class="backup-copy"><b>PC profile transfer</b><span>Import or export JSON profile files.</span></div><div class="actions"><button id="ffImport" class="secondary" type="button">Import PC</button><button id="ffExport" class="secondary" type="button">Export</button><input id="ffFileInput" type="file" accept=".json,application/json" hidden></div></div>
+    <div id="ffCompatibility" class="notice"><b>Compatibility check</b><p>Fleasion can validate JSON structure and value types. It cannot confirm that every community flag is currently supported by Roblox or apply flags to the Roblox app. Unsupported, deprecated or unknown flags must be checked against current official Roblox guidance.</p></div>
   </section>
   <section id="tools" class="panel">
     <div class="sectionhead"><div><span class="eyebrow">WORKSPACE UTILITIES</span><h2>Tools</h2><p class="muted">Quick checks and device storage.</p></div></div>
@@ -63,5 +80,5 @@
 <dialog id="profileDialog"><form method="dialog" id="profileForm"><div class="modalhead"><div><span class="eyebrow">PROFILE SETTINGS</span><h2 id="profileDialogTitle">New profile</h2></div><button class="iconbtn" value="cancel" aria-label="Close">✕</button></div><label>Profile name<input id="profileName" maxlength="60" required placeholder="e.g. My setup"></label><div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveProfile" value="default">Save profile</button></div></form></dialog>
 <dialog id="ruleDialog"><form method="dialog" id="ruleForm"><div class="modalhead"><div><span class="eyebrow">RULE EDITOR</span><h2 id="ruleDialogTitle">Add rule</h2></div><button class="iconbtn" value="cancel" aria-label="Close">✕</button></div><label>Original asset ID<input id="originalId" inputmode="numeric" placeholder="123456789" required></label><label>Replacement target<input id="replacement" placeholder="Asset ID, HTTPS URL, or local path" required></label><label>Notes <span class="optional">(optional)</span><input id="ruleNotes" maxlength="120" placeholder="Add a short note"></label><div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveRule" value="default">Save rule</button></div></form></dialog>
 <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
-<script src="app.js?v=103"></script>
+<script src="app.js?v=104"></script>
 </body></html>
