@@ -445,3 +445,134 @@ function refreshDeviceSnapshot() {
 const refreshDeviceButton = $("#refreshDevice");
 if (refreshDeviceButton) refreshDeviceButton.addEventListener("click", () => { refreshDeviceSnapshot(); toast("Device snapshot refreshed"); });
 refreshDeviceSnapshot();
+
+
+// Fleasion 0.7.0 — PC-style mobile modules. All data remains local.
+const FLAGS_KEY = "fleasion-mobile-fflags-v1";
+const ASSETS_KEY = "fleasion-mobile-assets-v1";
+const UI_KEY = "fleasion-mobile-ui-v1";
+let flagProfiles = {};
+let assetEntries = [];
+try { flagProfiles = JSON.parse(localStorage.getItem(FLAGS_KEY) || "{}") || {}; } catch { flagProfiles = {}; }
+try { assetEntries = JSON.parse(localStorage.getItem(ASSETS_KEY) || "[]"); if (!Array.isArray(assetEntries)) assetEntries = []; } catch { assetEntries = []; }
+function activeFlagKey() { return current().id; }
+function activeFlags() { return flagProfiles[activeFlagKey()] || {}; }
+function renderFlags() {
+  const flags = activeFlags();
+  $("#flagProfileName").textContent = current().name + " · FFlags";
+  $("#flagCount").textContent = Object.keys(flags).length + " flag entries · local profile";
+  $("#flagEditor").value = JSON.stringify(flags, null, 2);
+}
+function validateFlagObject(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("FFlags file must be a JSON object.");
+  const entries = Object.entries(value);
+  if (entries.length > 1000) throw new Error("Limit each profile to 1,000 entries.");
+  for (const [key, val] of entries) {
+    if (!key || key.length > 180) throw new Error("A flag name is empty or too long.");
+    if (!["string","number","boolean"].includes(typeof val)) throw new Error("Flag values must be strings, numbers or booleans.");
+    if (typeof val === "number" && !Number.isFinite(val)) throw new Error("Flag values must be finite numbers.");
+  }
+  return value;
+}
+$("#flagValidate").addEventListener("click", () => {
+  try {
+    const flags = validateFlagObject(JSON.parse($("#flagEditor").value || "{}"));
+    $("#flagStatus").innerHTML = "<b>JSON valid · " + Object.keys(flags).length + " entries</b><p>Compatibility remains unverified. Valid JSON does not mean Roblox supports or applies these flags.</p>";
+    toast("FFlags JSON is valid");
+  } catch (error) {
+    $("#flagStatus").innerHTML = "<b>Validation failed</b><p>" + escapeHtml(error.message) + "</p>";
+    toast("FFlags validation failed");
+  }
+});
+$("#flagSave").addEventListener("click", () => {
+  try {
+    flagProfiles[activeFlagKey()] = validateFlagObject(JSON.parse($("#flagEditor").value || "{}"));
+    localStorage.setItem(FLAGS_KEY, JSON.stringify(flagProfiles));
+    renderFlags();
+    toast("FFlags profile saved locally");
+  } catch (error) { toast("Cannot save: " + error.message); }
+});
+$("#flagExport").addEventListener("click", () => {
+  try {
+    const flags = validateFlagObject(JSON.parse($("#flagEditor").value || "{}"));
+    downloadJson(flags, (current().name.toLowerCase().replace(/[^a-z0-9]+/g,"-") || "fleasion") + "-fflags.json");
+    toast("FFlags JSON export prepared");
+  } catch (error) { toast("Export failed: " + error.message); }
+});
+$("#flagImport").addEventListener("click", () => $("#flagFile").click());
+$("#flagFile").addEventListener("change", async event => {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  try {
+    if (file.size > 1024 * 1024) throw new Error("Choose a JSON file smaller than 1 MB.");
+    const flags = validateFlagObject(JSON.parse(await file.text()));
+    flagProfiles[activeFlagKey()] = flags;
+    localStorage.setItem(FLAGS_KEY, JSON.stringify(flagProfiles));
+    renderFlags();
+    toast("PC FFlags JSON imported to this profile");
+  } catch (error) { toast("Import failed: " + error.message); }
+  finally { event.target.value = ""; }
+});
+function renderAssets() {
+  $("#assetList").innerHTML = assetEntries.map((item, index) =>
+    "<div class='item'><div class='itemcopy'><b>" + escapeHtml(item.name) + "</b><small>" + escapeHtml(item.note || "No notes") + (item.url ? " · " + escapeHtml(item.url) : "") + "</small></div><div class='itembuttons'><button class='danger' type='button' data-remove-asset='" + index + "'>Delete</button></div></div>"
+  ).join("") || "<div class='empty'>No saved asset references yet.</div>";
+}
+$("#assetAdd").addEventListener("click", () => {
+  const name = $("#assetId").value.trim();
+  const url = $("#assetUrl").value.trim();
+  const note = $("#assetNote").value.trim();
+  if (!name) return toast("Enter an asset ID or name");
+  if (url) {
+    try { const parsed = new URL(url); if (parsed.protocol !== "https:") throw new Error(); }
+    catch { return toast("Use a valid HTTPS reference URL"); }
+  }
+  assetEntries.unshift({ name: name.slice(0,100), url, note: note.slice(0,160), created: Date.now() });
+  try { localStorage.setItem(ASSETS_KEY, JSON.stringify(assetEntries)); } catch { toast("Storage is full; entry is session-only"); }
+  $("#assetId").value = ""; $("#assetUrl").value = ""; $("#assetNote").value = "";
+  renderAssets(); toast("Asset reference saved");
+});
+$("#assetList").addEventListener("click", event => {
+  const button = event.target.closest("[data-remove-asset]");
+  if (!button) return;
+  const index = Number(button.dataset.removeAsset);
+  if (!Number.isInteger(index) || !assetEntries[index]) return;
+  if (confirm("Delete this saved asset reference?")) {
+    assetEntries.splice(index,1);
+    try { localStorage.setItem(ASSETS_KEY, JSON.stringify(assetEntries)); } catch {}
+    renderAssets(); toast("Asset reference deleted");
+  }
+});
+$("#joinPlace").addEventListener("click", () => {
+  const id = $("#placeId").value.trim();
+  if (!/^[0-9]{1,24}$/.test(id)) return toast("Enter a numeric Place ID");
+  const url = "https://www.roblox.com/games/" + id;
+  window.open(url, "_blank", "noopener,noreferrer");
+  $("#joinStatus").textContent = "Opened the public Roblox experience page for Place ID " + id + ".";
+});
+function applyUiSettings(settings) {
+  document.body.classList.toggle("lite-ui", !!settings.lite);
+  document.body.classList.toggle("compact-ui", !!settings.compact);
+  document.body.classList.toggle("reduce-motion", !!settings.motion);
+  $("#liteMode").checked = !!settings.lite;
+  $("#compactMode").checked = !!settings.compact;
+  $("#reduceMotion").checked = !!settings.motion;
+  $("#fpsLiteToggle").checked = !!settings.lite;
+}
+let uiSettings = {};
+try { uiSettings = JSON.parse(localStorage.getItem(UI_KEY) || "{}") || {}; } catch { uiSettings = {}; }
+applyUiSettings(uiSettings);
+$("#fpsLiteToggle").addEventListener("change", event => {
+  uiSettings.lite = event.target.checked; applyUiSettings(uiSettings);
+  try { localStorage.setItem(UI_KEY, JSON.stringify(uiSettings)); } catch {}
+});
+$("#applyUiPreset").addEventListener("click", () => {
+  uiSettings = { lite: $("#liteMode").checked, compact: $("#compactMode").checked, motion: $("#reduceMotion").checked };
+  applyUiSettings(uiSettings);
+  try { localStorage.setItem(UI_KEY, JSON.stringify(uiSettings)); toast("Fleasion interface preset saved"); }
+  catch { toast("Preset active for this session only"); }
+});
+const originalRender = render;
+render = function() { originalRender(); renderFlags(); };
+renderAssets();
+renderFlags();
