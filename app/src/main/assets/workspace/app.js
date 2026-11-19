@@ -544,6 +544,7 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
+renderFF();
 render();
 if (startupWarning) toast(startupWarning);
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
