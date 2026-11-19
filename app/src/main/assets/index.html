@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080d16">
+<meta name="description" content="Fleasion Mobile — organize profiles and configuration backups.">
+
+<link rel="stylesheet" href="style.css?v=108">
+<title>Fleasion Mobile</title>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#" aria-label="Fleasion home"><span class="brand-mark">F<span>.</span></span><span class="brand-copy"><b>FLEASION</b><small>MOBILE WORKSPACE</small></span></a>
+  <div class="top-actions"><span class="version-pill">V0.8.0 ALPHA</span><button type="button" id="menuBtn" class="iconbtn menu-btn" aria-label="Open navigation menu" aria-controls="appNav" aria-expanded="false">☰</button><button type="button" id="themeBtn" class="iconbtn" aria-label="Switch theme" aria-pressed="false">☼</button></div>
+</header>
+<main>
+  <section class="hero">
+    <div class="hero-copy"><span class="eyebrow"><i></i> MOBILE PERFORMANCE WORKSPACE</span><h1>Play <span>smooth.</span></h1><p>Your profiles, device tools and performance guidance in one lightweight companion.</p></div>
+    <div class="hero-orbit" aria-hidden="true"><div class="orbit-ring"></div><div class="orbit-core">F<span>.</span></div><i class="orbit-dot"></i></div>
+  </section>
+  <section class="overview" aria-label="Workspace overview">
+    <div class="overview-head"><div><span class="eyebrow">OVERVIEW</span><h2>Your workspace</h2></div><span class="live-tag"><i></i> LOCAL</span></div>
+    <div class="stats">
+      <div class="stat-card"><span class="stat-symbol">▤</span><div><b id="profileStat">—</b><small>PROFILES</small></div></div>
+      <div class="stat-card"><span class="stat-symbol">⌁</span><div><b id="ruleStat">—</b><small>ACTIVE RULES</small></div></div>
+    </div>
+  </section>
+  <nav class="tabs" id="appNav" aria-label="App sections" role="tablist" hidden>
+    <button type="button" class="tab active" role="tab" aria-selected="true" data-tab="profiles"><span>⌂</span>Workspace</button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="rules"><span>⌁</span>Replacement rules</button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="fflags"><span>⚑</span>FFlags Lab</button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="assets"><span>▧</span>Asset Library</button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="joiner"><span>↗</span>Subplace Joiner</button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="mods"><span>⌘</span>Modifications</button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="proxy"><span>⇄</span>Proxy & Misc</button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="device"><span>▣</span>Device Lab</button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="tools"><span>⚡</span>FPS Lab</button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="shizuku"><span>⌘</span>Shizuku</button>
+    <button type="button" class="tab" role="tab" aria-selected="false" data-tab="settings"><span>⚙</span>Settings & info</button>
+  </nav>
+  <section id="profiles" class="panel active">
+    <div class="sectionhead"><div><span class="eyebrow">YOUR COLLECTION</span><h2>Profiles</h2><p class="muted">Separate setups, neatly organised.</p></div><button id="newProfile" class="primary">＋ New</button></div>
+    <div id="profileList" class="stack"></div>
+    <div class="backup-card"><div class="backup-icon">↕</div><div class="backup-copy"><b>Backup & transfer</b><span>Move profiles or keep a safe copy.</span></div><div class="actions"><button id="importConfig" class="secondary">Import</button><button id="exportConfig" class="secondary">Export</button><input id="fileInput" type="file" accept=".json,application/json" hidden></div></div>
+  </section>
+  <section id="rules" class="panel">
+    <div class="sectionhead"><div><span class="eyebrow">CONFIGURATION</span><h2>Replacement rules</h2><p class="muted">Manage the rules saved in your selected profile.</p></div><button id="newRule" class="primary">＋ Add</button></div>
+    <div class="search-wrap"><span>⌕</span><input id="ruleSearch" type="search" placeholder="Search ID, target or notes…" aria-label="Search replacement rules"></div>
+    <div class="rule-summary"><span id="ruleCount" class="muted"></span><span class="summary-dot"></span><span class="muted">Selected profile</span></div>
+    <div id="ruleList" class="stack"></div>
+    <div class="notice"><b>Companion mode</b><p>Fleasion organises and exports configuration data. It does not apply changes inside the Roblox Android app.</p></div>
+  </section>
+  <section id="fflags" class="panel">
+    <div class="sectionhead"><div><span class="eyebrow">FASTFLAG WORKSPACE</span><h2>FFlags Lab</h2><p class="muted">Import, organise, validate and export JSON profiles.</p></div></div>
+    <div class="toolcard"><div class="tool-icon">⚑</div><div class="tool-copy"><b id="flagProfileName">Default profile</b><p id="flagCount">0 flags in this profile</p></div><span class="local-chip">LOCAL</span></div>
+    <label class="editor-label" for="flagEditor">FastFlag JSON object</label>
+    <textarea id="flagEditor" class="code-editor" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder='{"DFIntTaskSchedulerTargetFps": 60}'></textarea>
+    <div class="action-grid"><button id="flagValidate" class="secondary">Validate JSON</button><button id="flagSave" class="primary">Save to profile</button><button id="flagImport" class="secondary">Import PC JSON</button><button id="flagExport" class="secondary">Export JSON</button><input id="flagFile" type="file" accept=".json,application/json" hidden></div>
+    <div id="flagStatus" class="notice"><b>Compatibility status: unverified</b><p>Fleasion does not assume a flag is supported. Roblox may ignore, change or remove flags; mobile and desktop support can differ. This editor does not apply flags to Roblox.</p></div>
+    <div class="notice"><b>Safe portability</b><p>Keep separate PC and mobile profiles. Export is a backup/transfer file only—not an installer, injector, or anti-cheat workaround.</p></div>
+  </section>
+  <section id="assets" class="panel">
+    <div class="sectionhead"><div><span class="eyebrow">ASSET WORKSPACE</span><h2>Asset Library</h2><p class="muted">Save your own asset references, notes and preview links.</p></div></div>
+    <div class="asset-form">
+      <label for="assetId">Asset ID or name<input id="assetId" maxlength="100" placeholder="Asset ID / item name"></label>
+      <label for="assetUrl">Reference URL <span class="optional">(HTTPS only)</span><input id="assetUrl" type="url" placeholder="https://www.roblox.com/..."></label>
+      <label for="assetNote">Notes<input id="assetNote" maxlength="160" placeholder="What is this asset for?"></label>
+      <button id="assetAdd" class="primary">＋ Save reference</button>
+    </div>
+    <div id="assetList" class="stack"></div>
+    <div class="notice"><b>Library mode, not scraping</b><p>This mobile companion stores references you add. It does not scrape private endpoints, download restricted assets, or copy content you do not have permission to use.</p></div>
+  </section>
+  <section id="joiner" class="panel">
+    <div class="sectionhead"><div><span class="eyebrow">PLACE SHORTCUT</span><h2>Subplace Joiner</h2><p class="muted">Open a Roblox experience from a place ID.</p></div></div>
+    <label for="placeId">Roblox Place ID<input id="placeId" inputmode="numeric" maxlength="24" placeholder="Enter numeric Place ID"></label>
+    <button id="joinPlace" class="primary">Open Roblox experience</button>
+    <p id="joinStatus" class="muted helper-text">This opens the public Roblox experience page. Joining still depends on Roblox, account permissions and app availability.</p>
+  </section>
+  <section id="mods" class="panel">
+    <div class="sectionhead"><div><span class="eyebrow">PROFILE ACTIONS</span><h2>Modifications</h2><p class="muted">Named Fleasion-side presets and quick actions.</p></div></div>
+    <div class="fps-panel">
+      <h3>Performance profile</h3>
+      <p class="muted">These switches adjust Fleasion's own interface only. They do not change Roblox or Android system settings.</p>
+      <div class="setting-row"><div><b>Lightweight interface</b><small>Reduce decorative effects in Fleasion.</small></div><input id="liteMode" type="checkbox"></div>
+      <div class="setting-row"><div><b>Reduce motion</b><small>Disable non-essential interface animations.</small></div><input id="reduceMotion" type="checkbox"></div>
+      <div class="setting-row"><div><b>Compact cards</b><small>Use denser spacing in the workspace.</small></div><input id="compactMode" type="checkbox"></div>
+      <button id="applyUiPreset" class="primary">Save interface preset</button>
+    </div>
+    <div class="notice"><b>Game modifications are not applied</b><p>Roblox client files, protected game data and anti-cheat are outside this companion's scope.</p></div>
+  </section>
+  <section id="proxy" class="panel">
+    <div class="sectionhead"><div><span class="eyebrow">NETWORK & UTILITIES</span><h2>Proxy & Misc</h2><p class="muted">Connection guidance and extra workspace tools.</p></div></div>
+    <div class="toolcard"><div class="tool-icon">⇄</div><div class="tool-copy"><b>Proxy status</b><p>Not connected or controlled by Fleasion. Android proxy and VPN settings are managed by the operating system or your chosen network app.</p></div><span class="local-chip">INFO ONLY</span></div>
+    <div class="notice"><b>Privacy note</b><p>Do not paste passwords, session cookies, authentication tokens or private account data into Fleasion files.</p></div>
+  </section>
+  <section id="tools" class="panel">
+    <div class="sectionhead"><div><span class="eyebrow">WORKSPACE UTILITIES</span><h2>Tools</h2><p class="muted">Quick checks and device storage.</p></div></div>
+    <div class="toolcard"><div class="tool-icon">✓</div><div class="tool-copy"><b>JSON validator</b><p>Check a config file before importing.</p></div><button id="validateBtn" class="secondary">Choose file</button><input id="validateInput" type="file" accept=".json,application/json" hidden></div>
+    <div class="fps-panel">
+      <div class="fps-panel-head"><div><span class="eyebrow">DEVICE CHECK</span><h3>FPS quick check</h3><p>Measures this app's browser animation smoothness, not Roblox's in-game FPS.</p></div><span class="fps-chip">5 SEC</span></div>
+      <div class="fps-result"><b id="fpsResult">—</b><span id="fpsResultLabel">Ready to test</span></div>
+      <button type="button" id="fpsTestBtn" class="primary fps-test">Run 5-second test</button>
+      <div class="setting-row"><div><b>Lightweight FPS Lab view</b><small>Reduce visual effects in this dashboard.</small></div><input id="fpsLiteToggle" type="checkbox"></div>
+      <div class="fps-profile-row"><label for="fpsProfile">Performance guide</label><select id="fpsProfile"><option value="low">Low-end device</option><option value="balanced" selected>Balanced</option><option value="performance">Performance priority</option></select></div>
+      <p id="fpsTips" class="fps-tips">Use Roblox's in-game graphics controls and keep the phone cool for steadier performance.</p>
+      <p class="fps-disclaimer">This tool does not change Roblox settings, install FFlags, or guarantee 30–50 FPS. Results depend on the phone, game, temperature and network.</p>
+    </div>
+    <div class="toolcard"><div class="tool-icon">▣</div><div class="tool-copy"><b>Local storage</b><p id="storageInfo">Your profiles are stored on this device.</p></div><span class="local-chip">ON DEVICE</span></div>
+    <div class="toolcard danger-card"><div class="tool-icon">↺</div><div class="tool-copy"><b>Reset workspace</b><p>Remove all locally saved profiles.</p></div><button id="resetBtn" class="danger">Reset</button></div>
+    <div class="notice roadmap"><b>Built for mobile</b><p>Fleasion Mobile is an independent companion for organising your own configuration data. PC Fleasion modules are being adapted into mobile-safe workspaces. Desktop-only integrations remain separate.</p></div>
+  </section>
+  <section id="device" class="panel">
+    <div class="sectionhead"><div><span class="eyebrow">ANDROID HARDWARE</span><h2>Device Lab</h2><p class="muted">A read-only snapshot of information your browser exposes.</p></div><button id="refreshDevice" class="secondary">↻ Refresh</button></div>
+    <div class="device-grid">
+      <div class="device-stat"><small>DEVICE PLATFORM</small><b id="devicePlatform">Checking…</b></div>
+      <div class="device-stat"><small>LOGICAL CPU CORES</small><b id="deviceCores">—</b></div>
+      <div class="device-stat"><small>MEMORY HINT</small><b id="deviceMemory">Unavailable</b></div>
+      <div class="device-stat"><small>SCREEN</small><b id="deviceScreen">—</b></div>
+    </div>
+    <div class="toolcard"><div class="tool-icon">◉</div><div class="tool-copy"><b>Performance basics</b><p>Keep at least 10–15% storage free, close apps you are not using, disable downloads during play and let the phone cool between long sessions.</p></div></div>
+    <div class="notice"><b>Hardware information limits</b><p>Android browsers do not expose exact free RAM, CPU temperature, GPU load or total storage to a normal website. Fleasion will not invent those readings or claim to clear system RAM.</p></div>
+  </section>
+  <section id="shizuku" class="panel">
+    <div class="sectionhead"><div><span class="eyebrow">ANDROID SERVICE BRIDGE</span><h2>Shizuku</h2><p class="muted">Permission guide and compatibility status.</p></div><span class="local-chip">COMPANION MODE</span></div>
+    <div class="shizuku-status"><span class="status-orb"></span><div><b>Checking native connection…</b><small>The native Android companion will report the actual service state here.</small></div></div>
+    <div class="toolcard"><div class="tool-icon">↗</div><div class="tool-copy"><b>Shizuku project</b><p>Read the official setup instructions and start the service using its supported Android method.</p></div><a class="secondary link-button" href="https://shizuku.rikka.app/" target="_blank" rel="noopener">Official guide</a></div>
+    <div class="notice"><b>What comes next</b><p>This APK checks the real Shizuku binder and permission state. No privileged changes are made by this alpha.</p></div>
+    <button id="nativeShizukuRequest" class="primary" type="button">Request Shizuku permission</button><div class="shizuku-check"><b>Supported design principles</b><ul><li>Show connection state only when verified.</li><li>Ask before each privileged operation.</li><li>Explain exactly what an operation changes.</li><li>Provide a way to cancel or reverse supported changes.</li></ul></div>
+  </section>
+  <section id="settings" class="panel">
+    <div class="sectionhead"><div><span class="eyebrow">APP PREFERENCES</span><h2>Settings & info</h2><p class="muted">About this build and your local data.</p></div></div>
+    <div class="toolcard"><div class="tool-icon">F.</div><div class="tool-copy"><b>Fleasion Mobile 0.8.0-alpha01</b><p>Independent Roblox configuration companion. Profiles and rules stay in this browser's local storage.</p></div><span class="local-chip">BETA</span></div>
+    <div class="toolcard"><div class="tool-icon">☾</div><div class="tool-copy"><b>Appearance</b><p>Use the sun/moon button in the top bar to switch themes.</p></div></div>
+    <div class="notice"><b>Safety & compatibility</b><p>Fleasion does not inject code into Roblox, bypass anti-cheat, modify protected game files or promise specific FPS gains. Configuration exports are for organising your own data.</p></div>
+  </section>
+  <footer><span class="footer-mark">F.</span><span>Fleasion Mobile 0.8.0-alpha01 · Independent companion</span></footer>
+</main>
+<dialog id="profileDialog"><form method="dialog" id="profileForm"><div class="modalhead"><div><span class="eyebrow">PROFILE SETTINGS</span><h2 id="profileDialogTitle">New profile</h2></div><button class="iconbtn" value="cancel" aria-label="Close">✕</button></div><label>Profile name<input id="profileName" maxlength="60" required placeholder="e.g. My setup"></label><div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveProfile" value="default">Save profile</button></div></form></dialog>
+<dialog id="ruleDialog"><form method="dialog" id="ruleForm"><div class="modalhead"><div><span class="eyebrow">RULE EDITOR</span><h2 id="ruleDialogTitle">Add rule</h2></div><button class="iconbtn" value="cancel" aria-label="Close">✕</button></div><label>Original asset ID<input id="originalId" inputmode="numeric" placeholder="123456789" required></label><label>Replacement target<input id="replacement" placeholder="Asset ID, HTTPS URL, or local path" required></label><label>Notes <span class="optional">(optional)</span><input id="ruleNotes" maxlength="120" placeholder="Add a short note"></label><div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveRule" value="default">Save rule</button></div></form></dialog>
+<div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+<script src="app.js?v=108"></script>
+</body></html>
