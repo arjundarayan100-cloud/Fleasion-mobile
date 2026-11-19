@@ -356,6 +356,7 @@ $("#fpsProfile").addEventListener("change", () => {
   $("#fpsTips").textContent = fpsGuides[$("#fpsProfile").value] || fpsGuides.balanced;
 });
 let fpsTestRunning = false;
+let fpsAnimationId = 0;
 $("#fpsTestBtn").addEventListener("click", () => {
   if (fpsTestRunning) return;
   fpsTestRunning = true;
@@ -365,32 +366,58 @@ $("#fpsTestBtn").addEventListener("click", () => {
   button.disabled = true;
   button.textContent = "Testing…";
   result.textContent = "…";
-  label.textContent = "Measuring this page";
-  const started = performance.now();
+  label.textContent = "Warming up the browser animation test";
+  let started = 0;
   let frames = 0;
+  let previousFrame = 0;
+  let totalFrameTime = 0;
+  function finish(message) {
+    fpsTestRunning = false;
+    cancelAnimationFrame(fpsAnimationId);
+    button.disabled = false;
+    button.textContent = "Run again";
+    if (message) {
+      result.textContent = "—";
+      label.textContent = message;
+    }
+  }
   function sample(now) {
     if (document.visibilityState === "hidden") {
-      fpsTestRunning = false;
-      button.disabled = false;
+      finish("Test paused because the app was hidden");
       button.textContent = "Run 5-second test";
-      result.textContent = "—";
-      label.textContent = "Test paused because the app was hidden";
       return;
     }
+    if (!started) {
+      started = now;
+      previousFrame = now;
+      fpsAnimationId = requestAnimationFrame(sample);
+      return;
+    }
+    totalFrameTime += now - previousFrame;
+    previousFrame = now;
     frames += 1;
     const elapsed = now - started;
     if (elapsed >= 5000) {
-      const measured = Math.round(frames * 1000 / elapsed);
+      const measured = Math.max(0, Math.round(frames * 1000 / elapsed));
+      const averageFrameTime = frames ? (totalFrameTime / frames).toFixed(1) : "—";
       result.textContent = measured + " FPS";
-      label.textContent = "Browser animation estimate · not Roblox FPS";
-      button.disabled = false;
-      button.textContent = "Run again";
-      fpsTestRunning = false;
+      label.textContent = "Avg. frame time: " + averageFrameTime + " ms · browser only";
+      finish();
       return;
     }
-    requestAnimationFrame(sample);
+    fpsAnimationId = requestAnimationFrame(sample);
   }
-  requestAnimationFrame(sample);
+  fpsAnimationId = requestAnimationFrame(sample);
+});
+document.addEventListener("visibilitychange", () => {
+  if (fpsTestRunning && document.visibilityState === "hidden") {
+    fpsTestRunning = false;
+    cancelAnimationFrame(fpsAnimationId);
+    $("#fpsTestBtn").disabled = false;
+    $("#fpsTestBtn").textContent = "Run 5-second test";
+    $("#fpsResult").textContent = "—";
+    $("#fpsResultLabel").textContent = "Test paused because the app was hidden";
+  }
 });
 
 render();
