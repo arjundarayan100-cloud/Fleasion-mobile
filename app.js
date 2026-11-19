@@ -123,6 +123,23 @@ $$(".tab").forEach((button) => button.addEventListener("click", () => {
   $$(".panel").forEach((panel) => panel.classList.toggle("active", panel.id === button.dataset.tab));
 }));
 
+const menuButton = $("#menuBtn");
+const appNav = $("#appNav");
+function setMenuOpen(open) {
+  appNav.hidden = !open;
+  menuButton.setAttribute("aria-expanded", String(open));
+  menuButton.setAttribute("aria-label", open ? "Close navigation menu" : "Open navigation menu");
+  menuButton.textContent = open ? "✕" : "☰";
+}
+menuButton.addEventListener("click", () => setMenuOpen(appNav.hidden));
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && !appNav.hidden) setMenuOpen(false);
+});
+document.addEventListener("click", event => {
+  if (!appNav.hidden && !appNav.contains(event.target) && !menuButton.contains(event.target)) setMenuOpen(false);
+});
+$(".tab").forEach(button => button.addEventListener("click", () => setMenuOpen(false)));
+
 $("#newProfile").addEventListener("click", () => {
   editingProfile = null;
   $("#profileDialogTitle").textContent = "New profile";
