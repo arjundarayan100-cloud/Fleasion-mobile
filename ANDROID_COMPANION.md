@@ -1,4 +1,4 @@
-# Fleasion Mobile — Native Android companion (0.6.0 alpha)
+# Fleasion Mobile — Native Android companion (0.6.0 alpha02)
 
 The repository contains a native Android companion alongside the existing 0.5.0 web companion.
 
