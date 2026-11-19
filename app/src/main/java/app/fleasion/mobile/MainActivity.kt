@@ -1,6 +1,7 @@
 package app.fleasion.mobile
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.ActivityManager
 import android.content.Intent
 import android.content.IntentFilter
@@ -215,8 +216,22 @@ class MainActivity : Activity() {
             refreshStatus()
             return
         }
-        runCatching { Shizuku.requestPermission(REQUEST_CODE) }
-            .onFailure { statusText.text = "Could not request permission: ${it.message ?: "unknown error"}" }
+        AlertDialog.Builder(this)
+            .setTitle("Allow Fleasion to use Shizuku?")
+            .setMessage(
+                "This grants Fleasion the Shizuku permission needed for explicitly requested " +
+                    "Android operations. This alpha currently performs read-only diagnostics " +
+                    "and does not change system settings or other apps. You can deny access " +
+                    "and continue using standard features."
+            )
+            .setNegativeButton("Not now", null)
+            .setPositiveButton("Continue") { _, _ ->
+                runCatching { Shizuku.requestPermission(REQUEST_CODE) }
+                    .onFailure {
+                        statusText.text = "Could not request permission: ${it.message ?: "unknown error"}"
+                    }
+            }
+            .show()
     }
 
     private fun cardTitle(value: String) = text(value, 11f, 0xFF52E3DF.toInt(), true)
