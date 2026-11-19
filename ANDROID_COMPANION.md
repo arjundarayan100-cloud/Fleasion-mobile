@@ -12,7 +12,7 @@ This repository now contains the first native Android app foundation alongside t
 
 ## Compatibility
 
-- Minimum Android version: Android 6.0 (API 23).
+- Minimum Android version: Android 7.0 (API 24).
 - Target SDK: 35.
 - Shizuku API: 13.1.5.
 - Android features must be checked at runtime. Shizuku does not grant root automatically; ADB-backed Shizuku has fewer privileges than root, and available operations vary by Android version and device vendor.
