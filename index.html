@@ -6,13 +6,13 @@
 <meta name="theme-color" content="#080d16">
 <meta name="description" content="Fleasion Mobile — organize profiles and configuration backups.">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="style.css?v=107">
+<link rel="stylesheet" href="style.css?v=108">
 <title>Fleasion Mobile</title>
 </head>
 <body>
 <header class="topbar">
   <a class="brand" href="#" aria-label="Fleasion home"><span class="brand-mark">F<span>.</span></span><span class="brand-copy"><b>FLEASION</b><small>MOBILE WORKSPACE</small></span></a>
-  <div class="top-actions"><span class="version-pill">V0.7.0</span><button type="button" id="themeBtn" class="iconbtn" aria-label="Switch theme" aria-pressed="false">☼</button></div>
+  <div class="top-actions"><span class="version-pill">V0.7.1</span><button type="button" id="menuBtn" class="iconbtn menu-btn" aria-label="Open navigation menu" aria-controls="appNav" aria-expanded="false">☰</button><button type="button" id="themeBtn" class="iconbtn" aria-label="Switch theme" aria-pressed="false">☼</button></div>
 </header>
 <main>
   <section class="hero">
@@ -26,7 +26,7 @@
       <div class="stat-card"><span class="stat-symbol">⌁</span><div><b id="ruleStat">—</b><small>ACTIVE RULES</small></div></div>
     </div>
   </section>
-  <nav class="tabs" aria-label="App sections" role="tablist">
+  <nav class="tabs" id="appNav" aria-label="App sections" role="tablist" hidden>
     <button type="button" class="tab active" role="tab" aria-selected="true" data-tab="profiles"><span>⌂</span>Workspace</button>
     <button type="button" class="tab" role="tab" aria-selected="false" data-tab="rules"><span>⌁</span>Replacement rules</button>
     <button type="button" class="tab" role="tab" aria-selected="false" data-tab="fflags"><span>⚑</span>FFlags Lab</button>
@@ -130,14 +130,14 @@
   </section>
   <section id="settings" class="panel">
     <div class="sectionhead"><div><span class="eyebrow">APP PREFERENCES</span><h2>Settings & info</h2><p class="muted">About this build and your local data.</p></div></div>
-    <div class="toolcard"><div class="tool-icon">F.</div><div class="tool-copy"><b>Fleasion Mobile 0.7.0</b><p>Independent Roblox configuration companion. Profiles and rules stay in this browser's local storage.</p></div><span class="local-chip">BETA</span></div>
+    <div class="toolcard"><div class="tool-icon">F.</div><div class="tool-copy"><b>Fleasion Mobile 0.7.1</b><p>Independent Roblox configuration companion. Profiles and rules stay in this browser's local storage.</p></div><span class="local-chip">BETA</span></div>
     <div class="toolcard"><div class="tool-icon">☾</div><div class="tool-copy"><b>Appearance</b><p>Use the sun/moon button in the top bar to switch themes.</p></div></div>
     <div class="notice"><b>Safety & compatibility</b><p>Fleasion does not inject code into Roblox, bypass anti-cheat, modify protected game files or promise specific FPS gains. Configuration exports are for organising your own data.</p></div>
   </section>
-  <footer><span class="footer-mark">F.</span><span>Fleasion Mobile 0.7.0 · Independent companion</span></footer>
+  <footer><span class="footer-mark">F.</span><span>Fleasion Mobile 0.7.1 · Independent companion</span></footer>
 </main>
 <dialog id="profileDialog"><form method="dialog" id="profileForm"><div class="modalhead"><div><span class="eyebrow">PROFILE SETTINGS</span><h2 id="profileDialogTitle">New profile</h2></div><button class="iconbtn" value="cancel" aria-label="Close">✕</button></div><label>Profile name<input id="profileName" maxlength="60" required placeholder="e.g. My setup"></label><div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveProfile" value="default">Save profile</button></div></form></dialog>
 <dialog id="ruleDialog"><form method="dialog" id="ruleForm"><div class="modalhead"><div><span class="eyebrow">RULE EDITOR</span><h2 id="ruleDialogTitle">Add rule</h2></div><button class="iconbtn" value="cancel" aria-label="Close">✕</button></div><label>Original asset ID<input id="originalId" inputmode="numeric" placeholder="123456789" required></label><label>Replacement target<input id="replacement" placeholder="Asset ID, HTTPS URL, or local path" required></label><label>Notes <span class="optional">(optional)</span><input id="ruleNotes" maxlength="120" placeholder="Add a short note"></label><div class="modalactions"><button class="secondary" value="cancel">Cancel</button><button class="primary" id="saveRule" value="default">Save rule</button></div></form></dialog>
 <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
-<script src="app.js?v=107"></script>
+<script src="app.js?v=108"></script>
 </body></html>
