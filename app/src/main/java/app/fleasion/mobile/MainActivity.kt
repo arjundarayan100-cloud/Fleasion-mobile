@@ -248,24 +248,27 @@ class MainActivity : Activity() {
         content.addView(diagnosticsScroll, FrameLayout.LayoutParams(-1, -1))
         diagnosticsScroll.visibility = View.GONE
 
+        // Persistent bottom navigation: content stays above these tabs.
         val navigation = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER_HORIZONTAL
-            setPadding(dp(10), dp(8), dp(10), dp(8))
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            setPadding(dp(8), dp(7), dp(8), dp(7))
             setBackgroundColor(0xFF0C1522.toInt())
         }
-        workspaceButton = navButton("▣   Workspace", true) { showWorkspace() }
-        deviceButton = navButton("⚙   Device + Shizuku", false) { showDevice() }
-        navigation.addView(workspaceButton, LinearLayout.LayoutParams(-1, dp(46)).apply {
-            bottomMargin = dp(6)
+        workspaceButton = navButton("▣  Workspace", true) { showWorkspace() }
+        deviceButton = navButton("⚙  Device + Shizuku", false) { showDevice() }
+        navigation.addView(workspaceButton, LinearLayout.LayoutParams(0, dp(50), 1f).apply {
+            marginEnd = dp(5)
         })
-        navigation.addView(deviceButton, LinearLayout.LayoutParams(-1, dp(46)))
+        navigation.addView(deviceButton, LinearLayout.LayoutParams(0, dp(50), 1f).apply {
+            marginStart = dp(5)
+        })
 
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setBackgroundColor(0xFF080D16.toInt())
-            addView(navigation, LinearLayout.LayoutParams(-1, -2))
             addView(content, LinearLayout.LayoutParams(-1, 0, 1f))
+            addView(navigation, LinearLayout.LayoutParams(-1, -2))
         }
         setContentView(root)
         showWorkspace()
