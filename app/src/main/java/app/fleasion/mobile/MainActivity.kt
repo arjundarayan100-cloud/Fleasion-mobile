@@ -142,6 +142,38 @@ class MainActivity : Activity() {
             setOnClickListener { refreshDiagnostics() }
         })
 
+        diagnosticsPage.addView(cardTitle("FPS READINESS · SAFE OPTIMIZATION"))
+        diagnosticsPage.addView(text(
+            "Fleasion checks memory pressure and thermal status, then lets you open Android's own settings. These are device-level steps, not a guaranteed in-game FPS boost.",
+            12f, 0xFF91A5B9.toInt(), false
+        ).apply { setPadding(0, 0, 0, dp(10)) })
+        diagnosticsPage.addView(Button(this).apply {
+            text = "Open Roblox app settings"
+            isAllCaps = false
+            setOnClickListener {
+                runCatching {
+                    startActivity(Intent(
+                        Intent.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.parse("package:com.roblox.client")
+                    ))
+                }.onFailure {
+                    Toast.makeText(this@MainActivity, "Could not open app settings", Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
+        diagnosticsPage.addView(Button(this).apply {
+            text = "Open display settings"
+            isAllCaps = false
+            setOnClickListener {
+                runCatching { startActivity(Intent(android.provider.Settings.ACTION_DISPLAY_SETTINGS)) }
+                    .onFailure { Toast.makeText(this@MainActivity, "Display settings unavailable", Toast.LENGTH_SHORT).show() }
+            }
+        })
+        diagnosticsPage.addView(text(
+            "For a 4 GB RAM phone: keep some storage free, close apps you are not using, avoid playing while the phone is hot, and use only refresh-rate options your display actually supports. Do not use RAM-cleaner apps or force-stop system services.",
+            11f, 0xFFD0DCE8.toInt(), false
+        ).apply { setPadding(0, dp(8), 0, dp(8)) })
+
         diagnosticsPage.addView(cardTitle("SHIZUKU CONNECTION"))
         statusText = text("Checking Shizuku…", 14f, 0xFFE8F4FF.toInt(), false)
         statusText.setPadding(0, dp(7), 0, dp(12))
@@ -216,17 +248,17 @@ class MainActivity : Activity() {
         diagnosticsScroll.visibility = View.GONE
 
         val navigation = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-            setPadding(dp(10), dp(7), dp(10), dp(7))
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER_HORIZONTAL
+            setPadding(dp(10), dp(8), dp(10), dp(8))
             setBackgroundColor(0xFF0C1522.toInt())
         }
-        workspaceButton = navButton("Workspace", true) { showWorkspace() }
-        deviceButton = navButton("Device + Shizuku", false) { showDevice() }
-        navigation.addView(workspaceButton, LinearLayout.LayoutParams(0, dp(44), 1f).apply {
-            marginEnd = dp(6)
+        workspaceButton = navButton("▣   Workspace", true) { showWorkspace() }
+        deviceButton = navButton("⚙   Device + Shizuku", false) { showDevice() }
+        navigation.addView(workspaceButton, LinearLayout.LayoutParams(-1, dp(46)).apply {
+            bottomMargin = dp(6)
         })
-        navigation.addView(deviceButton, LinearLayout.LayoutParams(0, dp(44), 1f))
+        navigation.addView(deviceButton, LinearLayout.LayoutParams(-1, dp(46)))
 
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -242,7 +274,9 @@ class MainActivity : Activity() {
         Button(this).apply {
             text = label
             isAllCaps = false
-            textSize = 12f
+            textSize = 13f
+            gravity = Gravity.CENTER_VERTICAL or Gravity.START
+            setPadding(dp(16), 0, dp(12), 0)
             setTextColor(if (selected) 0xFF06151B.toInt() else 0xFFE8F4FF.toInt())
             setBackgroundColor(if (selected) 0xFF52E3DF.toInt() else 0xFF18283A.toInt())
             setOnClickListener { action() }
