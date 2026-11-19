@@ -1,6 +1,7 @@
 package app.fleasion.mobile
 
 import android.app.Activity
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
@@ -10,7 +11,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.graphics.Color
 import android.graphics.Typeface
-import moe.shizuku.api.Shizuku
+import rikka.shizuku.Shizuku
 
 class MainActivity : Activity() {
     private lateinit var status: TextView
